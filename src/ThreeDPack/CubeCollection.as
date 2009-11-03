@@ -1,0 +1,64 @@
+package ThreeDPack
+{
+
+	/**
+	 * @author Gunnar
+	 */
+	public class CubeCollection// extends DrawElement 
+	{
+		static const left:uint=0;
+		static const right:uint=1;
+		static const top:uint=1<<1;
+		static const bottom:uint=1<<2;
+		static const forward:uint=1<<3;
+		static const back:uint=1<<4;
+		static var mCubes:Array;
+		var pos:ThreeDPoint;
+
+		public function CubeCollection(position:ThreeDPoint) 
+		{
+			//super("CubeCollection");
+			pos = position;
+
+			var rowCount = 5;
+			var size = 20;
+			var totalWidth:Number = rowCount*size;
+			var gap = 2;
+			mCubes = new Array(rowCount*rowCount);
+			var creationIndex = 0;
+			trace("LOADING CUBES!");
+			for(var row=0;row<rowCount;row++)
+				for(var col=0;col<rowCount;col++)
+				{
+					var position:ThreeDPoint = new ThreeDPoint(-totalWidth*0.5 + size*row * 1.3, -totalWidth*0.5 + size*col * 1.3, 0);
+					//var box = 
+					mCubes[creationIndex] = new Cube(size, position, ContentManager.getContent(creationIndex));
+					mCubes[creationIndex].name = "higherBox_"+creationIndex;
+					ThreeDCanvas.appendToObjects(mCubes[creationIndex]);
+					creationIndex++;
+				}
+		}
+		
+		function AddCube()
+		{
+		}
+		
+		function OnCollide()
+		{
+		}
+		
+		static function setCubesActive(act:Boolean, keyword:String)
+		{
+			for each(var aCube:Cube in mCubes)
+			{
+//				trace("mCategory:"+aCube.myContent.mCategory+", keyword:"+keyword);
+				if(aCube.myContent.mCategory == keyword)
+					aCube.setActive(act);
+			}
+		}
+
+//		function draw()
+//		{
+//		}
+	}
+}
