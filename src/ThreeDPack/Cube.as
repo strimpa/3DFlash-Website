@@ -91,15 +91,15 @@
 			if(!isActive() || currState!=COLLAPSED)
 				return;
 
-			var invWVMatrix:ThreeDMatrix = ThreeDCanvas.GetWorldViewMatrix().Inverse();
-			var distance = new ThreeDPoint(event.stageX, event.stageY,0).minus(position);
-			var swizzleDistance = new ThreeDPoint(distance.y, -distance.x, 0);
-			var localAxisVec:ThreeDPoint = swizzleDistance.mul(invWVMatrix);//(Math.random(),Math.random(),Math.random());
-			localAxisVec.normalize();
-			this.myMatrixStack[1].MakeAxisRotationMatrix(localAxisVec, 0.5);
-			var transVec:ThreeDPoint = new ThreeDPoint(0,0,5).mul(invWVMatrix);
-			transVec.scale(20);
-			this.myMatrixStack[1].translateByVec(transVec);
+			//var invWVMatrix:ThreeDMatrix = ThreeDCanvas.GetWorldViewMatrix().Inverse();
+			//var distance = new ThreeDPoint(event.stageX, event.stageY,0).minus(position);
+			//var swizzleDistance = new ThreeDPoint(distance.y, -distance.x, 0);
+			//var localAxisVec:ThreeDPoint = swizzleDistance.mul(invWVMatrix);//(Math.random(),Math.random(),Math.random());
+			//localAxisVec.normalize();
+			//this.myMatrixStack[1].MakeAxisRotationMatrix(localAxisVec, 0.5);
+			//var transVec:ThreeDPoint = new ThreeDPoint(0,0,5).mul(invWVMatrix);
+			//transVec.scale(20);
+			//this.myMatrixStack[1].translateByVec(transVec);
 			ThreeDApp.output("Content clicked:"+myContent.mTitle);
 
 			TitleFieldManager.fadeOutTitle(myTitleSprite);
@@ -164,11 +164,11 @@
 			if (movePerc > 0)
 			{
 				var initViewMatrix:ThreeDMatrix = new ThreeDMatrix();
-				initViewMatrix.rotate(180, ThreeDCanvas.dragRot-(ThreeDCanvas.dragRot%90), 0);
-				var transWVMatrix:ThreeDMatrix = ThreeDCanvas.GetWorldViewMatrix().Transpose();
-				myMatrixStack[2] = ThreeDMatrix.tweenValues(initViewMatrix, transWVMatrix, movePerc);
-			//myMatrixStack[2].ScaleValues(movePerc);
-			//myMatrixStack[2].traceMe("myMatrixStack[2]");
+				var targetRot:Number = ThreeDCanvas.dragRot - (ThreeDCanvas.dragRot % 90);
+				trace("targetRot:" + targetRot);
+				var currMoveRot:Number = (targetRot - ThreeDCanvas.dragRot) * movePerc;
+				initViewMatrix.rotate(180, currMoveRot, 0);
+				myMatrixStack[2] = initViewMatrix;
 			}
 			else
 				myMatrixStack[2].Identity();

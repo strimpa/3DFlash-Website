@@ -7,34 +7,34 @@
 	
 	public class CurvedLine
 	{
-		var begin:Point;
-		var control1:Point;
-		var control2:Point;
-		var end:Point;
-		var allBegins:Array;
-		var allControls:Array;
-		//var allControls2:Array;
-		var allEnds:Array;
-		var allJoins:Array;
-		var tempEnds:Array;
-		var tempEndIndex:Number = 0;
-		var currSection:Number;
-		var currPoint:Number;
-		var middlePoints1:Point;
-		var middlePoints2:Point;
-		var middlePoints3:Point;
+		private var begin:Point;
+		private var control1:Point;
+		private var control2:Point;
+		private var end:Point;
+		private var allBegins:Array;
+		private var allControls:Array;
+		//private var allControls2:Array;
+		private var allEnds:Array;
+		private var allJoins:Array;
+		private var tempEnds:Array;
+		private var tempEndIndex:Number = 0;
+		private var currSection:Number;
+		private var currPoint:Number;
+		private var middlePoints1:Point;
+		private var middlePoints2:Point;
+		private var middlePoints3:Point;
 		
-		var allPointsGuide:Array;
-		var allPointsCurvedOld:Array;
-		var allPointsCurvedNew:Array;
-		var allPointsCurvedCurr:Array;
-		var testPoints:Array;
+		private var allPointsGuide:Array;
+		private var allPointsCurvedOld:Array;
+		private var allPointsCurvedNew:Array;
+		private var allPointsCurvedCurr:Array;
+		private var testPoints:Array;
 		
-		var animating:Boolean=false;
-		var animIndex:Number=0;
-		const animDuration:Number = 10;
+		private var animating:Boolean=false;
+		private var animIndex:Number=0;
+		private const animDuration:Number = 10;
 		
-		var myCanvas:Sprite;
+		private var myCanvas:Sprite;
 		
 		public function CurvedLine()
 		{
@@ -51,13 +51,14 @@
 		math helper functions
 		****************************************************************************/
 		
-		private function getPointOnBezierLine(begin:Point, control1:Point, control2:Point, end:Point, t:Number){
+		private function getPointOnBezierLine(begin:Point, control1:Point, control2:Point, end:Point, t:Number):Point
+		{
 			var firstSecPoint:Point;
 			var secondSecPoint:Point;
 			var thirdSecPoint:Point;
 			var fourthSecPoint:Point;
 					
-			var currPercentage = t/CurvedLineManager.numPointsOnSection;
+			var currPercentage:Number = t/CurvedLineManager.numPointsOnSection;
 			
 			firstSecPoint = new Point(begin.x+((control1.x-begin.x)*currPercentage),
 									  begin.y+((control1.y-begin.y)*currPercentage));
@@ -86,11 +87,11 @@
 			return back;
 		}
 		
-		private function fillUpControls(beginIndex:Number, fillcontrol1:Point, fillcontrol2:Point, endIndex:Number, wantedDepth:Number, currDepth:Number){
+		private function fillUpControls(beginIndex:Number, fillcontrol1:Point, fillcontrol2:Point, endIndex:Number, wantedDepth:Number, currDepth:Number):void{
 			var newControls:Array = subdivideBezier(allPointsGuide[beginIndex], fillcontrol1, fillcontrol2, allPointsGuide[endIndex]);
 			if(currDepth<wantedDepth){
 				var joinIndex:Number = Math.round(beginIndex+(endIndex-beginIndex)/2);
-				var theJoin = allPointsGuide[joinIndex];
+				var theJoin:Point = allPointsGuide[joinIndex];
 				//trace("depth:"+currDepth+", fillbegin: "+allPointsGuide[beginIndex]+", fillcontrol1: "+fillcontrol1+", fillcontrol2: "+fillcontrol2+", fillend:"+allPointsGuide[endIndex]);
 				fillUpControls(beginIndex, newControls[0], newControls[1], joinIndex, wantedDepth, currDepth+1);
 				fillUpControls(joinIndex, newControls[2], newControls[3], endIndex, wantedDepth, currDepth+1);
@@ -101,7 +102,7 @@
 			}
 		}
 	
-		private function subdivideBezier(bezierBegin:Point, bezierControl1:Point, bezierControl2:Point, bezierEnd:Point){
+		private function subdivideBezier(bezierBegin:Point, bezierControl1:Point, bezierControl2:Point, bezierEnd:Point):Array{
 				
 			var returnControls:Array = new Array(4);
 			// save middlepoints
@@ -160,20 +161,20 @@
 //			trace("numSections:"+numSections);
 			if(CurvedLineManager.numSections>0 && CurvedLineManager.numSections%2==0){
 				//guideLine
-				for(var i=0;i<CurvedLineManager.numPointsOnSection;i++){
+				for(var i:uint=0;i<CurvedLineManager.numPointsOnSection;i++){
 					allPointsGuide[i]=getPointOnBezierLine(begin, control1, control2, end, i);
 				}
 				allPointsGuide[CurvedLineManager.numPointsOnSection]=end;
 				
 				//gerate controlPoints
-				for(var j=0;j<CurvedLineManager.numSections-1;j++){
+				for(var j:uint=0;j<CurvedLineManager.numSections-1;j++){
 					//trace("joins at: "+Math.floor((numPointsOnSection/numSections)*(j+1)));
 					allJoins[j]=allPointsGuide[Math.floor((CurvedLineManager.numPointsOnSection/CurvedLineManager.numSections)*(j+1))];
 				}
 				
 				
 				//trace("numSections"+numSections);
-				for(var mVar=0;mVar<CurvedLineManager.numSections;mVar++){
+				for(var mVar:uint=0;mVar<CurvedLineManager.numSections;mVar++){
 					if(mVar==0){
 						allBegins[mVar] = begin.clone();
 						allEnds[mVar] = allJoins[mVar].clone();
@@ -187,7 +188,7 @@
 				}
 				
 				if(CurvedLineManager.shiftFlag){
-					for(var shift=0;shift<CurvedLineManager.numSections;shift++){
+					for(var shift:uint=0;shift<CurvedLineManager.numSections;shift++){
 						allBegins[shift].x+=Math.random()*30-15;
 						allBegins[shift].y+=Math.random()*30-15;
 						allEnds[shift].x+=Math.random()*30-15;
@@ -204,7 +205,7 @@
 					for(countDown=allEnds.length-1;countDown >= 0; countDown--){
 						
 						//trace("countDown:"+countDown+", "+this.allBegins[8]+", "+this.allBegins[countDown]);
-						var punkt = allEnds[countDown];
+						var punkt:Point = allEnds[countDown];
 						var lastPoint:Point = allBegins[countDown];
 						//trace("lastPoint:"+lastPoint);
 						var newBegins:Array = new Array(); // all new Curve Points = 8points to sting, 8 points back, ...
@@ -212,8 +213,8 @@
 						var newControls1:Array = new Array();
 						var newControls2:Array = new Array();
 						
-						var radius = 10+Math.random()*50;
-						var angleRand = -1+Math.random()*3;
+						var radius:Number = 10+Math.random()*50;
+						var angleRand:Number = -1+Math.random()*3;
 						var angle:Number = (angleRand<=0)?-90:90;
 						var vectorToRotate:Point = lastPoint.subtract(punkt);
 						vectorToRotate.normalize(radius);
@@ -264,7 +265,7 @@
 						allBegins.splice(countDown, 1);
 						allControls.splice((countDown*2), 1);
 						allEnds.splice(countDown, 1);
-	*/					for(var newCurvesI=0;newCurvesI<newBegins.length;newCurvesI++){
+	*/					for(var newCurvesI:uint=0;newCurvesI<newBegins.length;newCurvesI++){
 							allBegins.splice(countDown+newCurvesI, 0, newBegins[newCurvesI]);
 							allControls.splice(((countDown*2)+(newCurvesI*2)), 0, newControls1[newCurvesI], newControls2[newCurvesI]);
 							allEnds.splice(countDown+newCurvesI, 0, newEnds[newCurvesI]);
@@ -277,10 +278,10 @@
 				
 				
 			
-				for(var v=0;v<allBegins.length;v++){
+				for(var v:uint=0;v<allBegins.length;v++){
 					var offset:Number = (v*CurvedLineManager.numPointsOnSection);
-					for(var i=0;i<CurvedLineManager.numPointsOnSection;i++){
-						allPointsCurvedNew[offset+i]=getPointOnBezierLine(allBegins[v], allControls[v*2], allControls[v*2+1], allEnds[v], i);
+					for(var i2:uint=0;i2<CurvedLineManager.numPointsOnSection;i2++){
+						allPointsCurvedNew[offset+i2]=getPointOnBezierLine(allBegins[v], allControls[v*2], allControls[v*2+1], allEnds[v], i2);
 					}
 	//				trace("v:"+v);
 				}
@@ -296,7 +297,7 @@
 		} // calculate
 		
 	
-		private function drawCross(graphics:Graphics, punkt:Point){
+		private function drawCross(graphics:Graphics, punkt:Point):void{
 			if(CurvedLineManager.drawCrossesFlag){
 				graphics.moveTo(punkt.x-2, punkt.y-2);
 				graphics.lineTo(punkt.x+2, punkt.y+2);
@@ -305,7 +306,7 @@
 			}
 		}
 		
-		private function drawCircle(graphics:Graphics, punkt:Point, radius:Number){
+		private function drawCircle(graphics:Graphics, punkt:Point, radius:Number):void{
 			graphics.moveTo(punkt.x-radius, punkt.y);
 			graphics.curveTo(punkt.x-radius, punkt.y-radius, punkt.x, 		 punkt.y-radius);
 			graphics.curveTo(punkt.x+radius, punkt.y-radius, punkt.x+radius, punkt.y);
@@ -313,7 +314,7 @@
 			graphics.curveTo(punkt.x-radius, punkt.y+radius, punkt.x-radius, punkt.y);
 		}
 		
-		private function drawDecoCircle(graphics:Graphics, punkt:Point, radius:Number, nextPoint:Point){
+		private function drawDecoCircle(graphics:Graphics, punkt:Point, radius:Number, nextPoint:Point):void{
 			var angle:Number = -90;
 			var vectorToRotate:Point = nextPoint.subtract(punkt);
 			vectorToRotate.normalize(radius);
@@ -341,7 +342,7 @@
 		}
 	
 	
-		public function Process()
+		public function Process():void
 		{
 			if(animIndex>0)
 			{
@@ -366,12 +367,12 @@
 				allPointsCurvedCurr = allPointsCurvedNew;
 		}
 		
-		public function draw()
+		public function draw():void
 		{
 			if(myCanvas==undefined)
 				return;
 				
-			var graphics = myCanvas.graphics;
+			var graphics:Graphics = myCanvas.graphics;
 			if(allPointsCurvedCurr.length<1)// || animIndex==0)
 			{
 //				trace("allPointsCurvedCurr.length<1");
@@ -380,8 +381,8 @@
 				
 			//var glow:Sprite = ThreeDCanvas.glowSprite;
 			
-			var circleDrawIndex=0;
-			var currIntervalBegin=0;
+			var circleDrawIndex:uint=0;
+			var currIntervalBegin:uint=0;
 	
 	/*		for(var b=0;b<allControls.length;b++){
 				this.lineStyle(1, 0xFF0000*((b%4)/4), 100, false, "none");
@@ -406,17 +407,17 @@
 			//Guide
 			if(CurvedLineManager.drawGuideFlag){
 				graphics.moveTo(allPointsGuide[0].x, allPointsGuide[0].y);
-				for(var k=1;k<allPointsGuide.length;k++){
-					graphics.lineTo(allPointsGuide[k].x, allPointsGuide[k].y);
+				for(var k2:uint=1;k2<allPointsGuide.length;k2++){
+					graphics.lineTo(allPointsGuide[k2].x, allPointsGuide[k2].y);
 				}
 			}
 	
-			var colorSwop=true;
+			var colorSwop:Boolean=true;
 
 	
 			if(CurvedLineManager.fillingFlag)graphics.beginFill(CurvedLineManager.colour, 50);
 			graphics.moveTo(allPointsCurvedCurr[0].x, allPointsCurvedCurr[0].y);
-			for(var k=1;k<allPointsCurvedCurr.length;k++){
+			for(var k:uint=1;k<allPointsCurvedCurr.length;k++){
 				graphics.lineTo(allPointsCurvedCurr[k].x, allPointsCurvedCurr[k].y);
 				if(CurvedLineManager.drawCircleFlag && (k+1)%(CurvedLineManager.numPointsOnSection*6)==0){
 					//circleDrawIndex--;

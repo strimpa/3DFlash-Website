@@ -268,6 +268,7 @@
 		public function mouseRotate(rot:Point)
 		{
 				//dragRot=dragRot.add(rot);
+				trace("dragRot:"+dragRot);
 				currRot += rot.y;
 		}
 		

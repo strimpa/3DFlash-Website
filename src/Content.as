@@ -15,7 +15,7 @@ package {
 		{
 		}
 		
-		private function Load()
+		private function Load():void
 		{
 		} 
 	
