@@ -9,21 +9,21 @@
 
 	public class Polygon extends DrawElement
 	{
-		var COLLAPSED:uint = 0,
+		private const COLLAPSED:uint = 0,
 			EXTENDING:uint = 1,
 			EXTENDED:uint = 2,
 			COLLAPSING:uint = 3;
 		private var mCurrState:uint;
 
-		var parentObj:ThreeDObject;
-		var unsortedIndex:Number;
-		var pointIndices:Array;
-		var adjacencyIndices:Array;
-		var normalIndices:Array;
-		var smoothingGroup:Number; 
+		private var parentObj:ThreeDObject;
+		public var unsortedIndex:Number;
+		public var pointIndices:Array;
+		public var adjacencyIndices:Array;
+		public var normalIndices:Array;
+		public var smoothingGroup:Number; 
 		public var depth1:Number=0;
 		public var depth2:Number=0;
-		var opacity:Number=100;
+		public var opacity:Number=100;
 		public var colour:Number;
 		
 	// new point calculation
@@ -184,12 +184,14 @@
 
 		public function processStates():void
 		{
+//			trace(mCurrState);
 			if(EXTENDING==getState())//this.movementIndex<this.pendingMovements.length)
 			{
 				this.moving=true;
 				colour = mouseOverColour;
-				if(jumpLength==this.movementIndex)
+				if(this.movementIndex==this.pendingMovements.length)
 				{
+//					trace("this.movementIndex==this.pendingMovements.length");
 					setState(EXTENDED);
 				}
 				else
@@ -216,9 +218,14 @@
 		}
 		public function moveStep():void
 		{
-			if(mCurrState==COLLAPSING || mCurrState==EXTENDING)
-				this.moveMatrix=this.moveMatrix.mul(this.pendingMovements[this.movementIndex++]);
-			var percentage = (this.movementIndex*3)/this.pendingMovements.length;
+//			trace(mCurrState);
+			if (COLLAPSING==getState() || EXTENDING==getState())
+			{
+				this.moveMatrix = this.pendingMovements[this.movementIndex];
+				this.movementIndex++;
+//				trace("mCurrState:"+mCurrState+", movePercentage:"+movementIndex+", pendingMovements.length:"+pendingMovements.length);
+			}
+			var percentage = (this.movementIndex * 3) / this.pendingMovements.length;
 			this.movePercentage = percentage<0.3?percentage:(percentage>2.7?(percentage-3)/-1:0.3);
 		}
 		
@@ -241,40 +248,45 @@
 		{
 			this.parentObj = parent;
 			processStates();
-//			moveStep();
-//			if(moving)
-//			{
-//				parent.SetMovingPolyIndex(this.unsortedIndex);
-//			}
+			moveStep();
+			if(moving)
+			{
+				parent.SetMovingPolyIndex(this.unsortedIndex);
+			}
 			colour = parentObj.colour;
 		}
 
-		public function jump():void
+		public function calcMovements():void
 		{
-			if(!this.moving) 
+			var dir:ThreeDPoint = this.faceNormal;
+			dir.normalize(10);
+
+			this.movementIndex=0;
+			this.pendingMovements=new Array();
+
+			var formerMat:ThreeDMatrix = moveMatrix;
+			this.pendingMovements[0] = formerMat;
+			for(var jumpIndex:Number=1;jumpIndex<jumpLength;jumpIndex++)
 			{
-				// reseting values
-				this.movementIndex=0;
-				this.pendingMovements=new Array();
-				var dir:ThreeDPoint = this.faceNormal;
-				//				trace("moveVecs"+this.moveVecs+", requested index: "+dirIndex);
-				//trace("value: "+faceNormal);
-//				trace("this.unsortedIndex:"+this.unsortedIndex+", this.pointIndices:"+this.pointIndices);
-				mCurrState = EXTENDING;
-				dir.normalize(10);
-				for(var jumpIndex:Number=0;jumpIndex<jumpLength;jumpIndex++){
-					this.pendingMovements[jumpIndex]=new ThreeDMatrix();
-					var multiplier:Number=(jumpIndex<jumpLength/2?(1/(jumpIndex+1)):-1/(jumpLength-jumpIndex));
-					//trace("multiplier:"+multiplier);
-					var currVec:ThreeDPoint = new ThreeDPoint(dir.x*multiplier, dir.y*multiplier, dir.z*multiplier);
-					this.pendingMovements[jumpIndex].translate(currVec.x, currVec.y, currVec.z);
-				}
-//				trace("jump!"+this.pendingMovements);
+				this.pendingMovements[jumpIndex]=new ThreeDMatrix();
+				var multiplier:Number=1/(jumpIndex+1);
+				var currVec:ThreeDPoint = new ThreeDPoint(dir.x*multiplier, dir.y*multiplier, dir.z*multiplier);
+				
+				var transMat:ThreeDMatrix=new ThreeDMatrix();
+				transMat.translate(currVec.x, currVec.y, currVec.z);
+				this.pendingMovements[jumpIndex] = formerMat = formerMat.mul(transMat);
 			}
-			if(mCurrState==EXTENDED)
+		}
+
+		public function jump():void //dirIndex:Number
+		{
+			if(mCurrState==COLLAPSED)
 			{
-				mCurrState=COLLAPSING;
+				calcMovements();
+				setState(EXTENDING);
 			}
+			else
+				setState(COLLAPSING);
 		}
 
 		public function draw(points:Array, normals:Array=undefined):void

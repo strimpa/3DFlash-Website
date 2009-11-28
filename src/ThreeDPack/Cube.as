@@ -88,6 +88,10 @@
 			var currState = getState();
 			super.mouseClickHandler(event);
 
+			trace("click");
+			for each(var poly:Polygon in polygons)
+				poly.jump();
+
 			if(!isActive() || currState!=COLLAPSED)
 				return;
 
@@ -101,7 +105,7 @@
 			//transVec.scale(20);
 			//this.myMatrixStack[1].translateByVec(transVec);
 			ThreeDApp.output("Content clicked:"+myContent.mTitle);
-
+			
 			TitleFieldManager.fadeOutTitle(myTitleSprite);
 		}
 		
@@ -165,7 +169,6 @@
 			{
 				var initViewMatrix:ThreeDMatrix = new ThreeDMatrix();
 				var targetRot:Number = ThreeDCanvas.dragRot - (ThreeDCanvas.dragRot % 90);
-				trace("targetRot:" + targetRot);
 				var currMoveRot:Number = (targetRot - ThreeDCanvas.dragRot) * movePerc;
 				initViewMatrix.rotate(180, currMoveRot, 0);
 				myMatrixStack[2] = initViewMatrix;
@@ -188,6 +191,7 @@
 				TitleFieldManager.fadeOutTitle(myTitleSprite);
 				mouseIsOverMe = true;
 			}
+			
 			super.Process();
 		} 
 

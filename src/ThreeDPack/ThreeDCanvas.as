@@ -23,6 +23,7 @@
 		public static var drawList:Array;
 		public static var drawListSprite:Sprite;
 		public static var glowSprite:Sprite;
+		public static var selectedSprite:Sprite;
 		
 		var colour:Number;
 		
@@ -101,6 +102,9 @@
 			glowSprite.cacheAsBitmap = true;
 			glowSprite.filters = new Array(filter);
 			addChild(glowSprite);
+			selectedSprite = new Sprite();
+			selectedSprite.cacheAsBitmap = true;
+			addChild(selectedSprite);
 			
 			drawListSprite.mask = ThreeDApp.CreateMask(ThreeDApp.spectrumMiddle);
 			
@@ -268,7 +272,7 @@
 		public function mouseRotate(rot:Point)
 		{
 				//dragRot=dragRot.add(rot);
-				trace("dragRot:"+dragRot);
+				//trace("dragRot:"+dragRot);
 				currRot += rot.y;
 		}
 		
@@ -279,6 +283,8 @@
 				drawListSprite.removeChildAt(delIndex);
 			for(delIndex=0;delIndex<glowSprite.numChildren;delIndex++)
 				glowSprite.removeChildAt(delIndex);
+			for(delIndex=0;delIndex<selectedSprite.numChildren;delIndex++)
+				selectedSprite.removeChildAt(delIndex);
 //			glowSprite.graphics.clear();
 
 //			drawListSprite = new Sprite();
@@ -331,7 +337,11 @@
 //			glowSprite.addChild(currGlowChild);
 			for(var drawListIndex:Number=0; drawListIndex<drawList.length; drawListIndex++)
 			{
-				if(drawList[drawListIndex].getGlowPercentage()>0)//smoothingGroup==8
+				if (drawList[drawListIndex].getState() != ThreeDObject.COLLAPSED)
+				{
+					selectedSprite.addChild(drawList[drawListIndex]);
+				}
+				else if(drawList[drawListIndex].getGlowPercentage()>0)//smoothingGroup==8
 				{
 //					if(formerParent==undefined || formerParent!=drawList[drawListIndex].parentObj)
 //					{

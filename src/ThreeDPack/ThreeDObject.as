@@ -6,10 +6,10 @@
 
 	public class ThreeDObject extends DrawElement
 	{
-		var COLLAPSED:uint = 0,
-			EXTENDING:uint = 1,
-			EXTENDED:uint = 2,
-			COLLAPSING:uint = 3;
+		public static const 	COLLAPSED:uint = 0,
+						EXTENDING:uint = 1,
+						EXTENDED:uint = 2,
+						COLLAPSING:uint = 3;
 		private var mCurrState:uint;
 
 		public var isMovable:Boolean = true;
@@ -95,7 +95,7 @@
 		public function addPoly(poly:Polygon):void
 		{
 			polygons.push(poly);
-			poly.unsortedIndex = polygons.length-1;
+			//			poly.unsortedIndex = polygons.length-1;
 		}
 		
 		public function SetMovingPolyIndex(index:Number):void
@@ -181,6 +181,9 @@
 					}
 	//				trace("currMovingPolyPoints[0]:"+currMovingPolyPoints[0]);
 				}
+				//trace("currMovingPolyPoints");
+				//for each(var point in currMovingPolyPoints)
+					//trace(point);
 				movingPointsCalculated = true;
 			}
 //			sort();
@@ -344,13 +347,13 @@
 		
 		public function Process():void
 		{
-//			this.currMovingPolyIndeces=undefined;
+			this.currMovingPolyIndeces=undefined;
 			for(var moveIndPoly:Number=0;moveIndPoly<polygons.length;moveIndPoly++)
 			{
 				polygons[moveIndPoly].Process(this);
 			}
-//			if(this.currMovingPolyIndeces==undefined)
-//				this.movingPointsCalculated=false;
+			if(this.currMovingPolyIndeces==undefined)
+				this.movingPointsCalculated=false;
 				
 			processStates();
 			moveStep();
@@ -413,7 +416,7 @@
 		
 		public function setState(state:uint)
 		{
-			ThreeDApp.output("set to state:"+state);
+//			ThreeDApp.output("set to state:"+state);
 			mCurrState=state;
 		}
 		public function getState()
@@ -569,11 +572,11 @@
 				ThreeDCanvas.appendToDrawList(currFace);
 // end drawList approach
 
-//				if(isMoving && (this.currMovingPolyIndeces.indexOf(currFace.unsortedIndex) != -1))
-//				{
-//					currFace.draw(currMovingPolyPoints, renderNormals);
-//				}
-//				else
+				if(isMoving && this.currMovingPolyIndeces!=undefined)// && (this.currMovingPolyIndeces.indexOf(currFace.unsortedIndex) != -1))
+				{
+					currFace.draw(currMovingPolyPoints, renderNormals);
+				}
+				else
 				{
 					currFace.draw(renderPoints, renderNormals);
 				}
