@@ -232,6 +232,15 @@
 			return this;
 		}
 		
+		public function Translation():ThreeDPoint
+		{
+			return new ThreeDPoint(
+				this.tx,
+				this.ty,
+				this.tz
+			);
+		}
+		
 		public function scale(malx:Number,maly:Number,malz:Number):void{
 			this.a*=malx;
 			this.e*=maly;

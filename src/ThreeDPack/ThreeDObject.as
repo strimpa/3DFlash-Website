@@ -164,8 +164,11 @@
 						continue;
 					}
 					var polyMatrixStack:Array = new Array();
-					if(movingPoly.moveMatrix!=undefined)
+					if (movingPoly.moveMatrix != undefined)
+					{
 						polyMatrixStack[0] = movingPoly.moveMatrix;
+						trace(polyMatrixStack[0].Translation());
+					}
 					else 
 						trace("No object transformation matrix!");
 					polyMatrixStack = polyMatrixStack.concat(matrixStack);
@@ -175,9 +178,11 @@
 						if(pointAlreadyCalculated[currIndex]!="yes")
 						{
 							currMovingPolyPoints[currIndex] = goThroughPoints(polyMatrixStack, points[movingPoly.pointIndices[pointIndex]]);
-//							trace("movingPoly.pointIndices[pointIndex]:"+movingPoly.pointIndices[pointIndex]+", "+currMovingPolyPoints[currIndex]);
+							trace("currIndex:"+currIndex+", "+currMovingPolyPoints[currIndex]);
 							pointAlreadyCalculated[currIndex]="yes";
 						}
+						else
+							trace("pointAlreadyCalculated:"+currIndex);
 					}
 	//				trace("currMovingPolyPoints[0]:"+currMovingPolyPoints[0]);
 				}

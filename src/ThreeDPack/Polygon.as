@@ -36,7 +36,6 @@
 		public var movementIndex:Number=0;
 		public var moving:Boolean=false;
 		public var otherElementParts:Array;
-		public var movePercentage:Number;
 		
 		public function Polygon(points_p:Array, unsortedIndex:uint, parent:ThreeDObject=undefined, normals:Array=undefined, copyPropsFrom:Polygon=undefined):void{
 			this.pointIndices = points_p;
@@ -218,20 +217,18 @@
 		}
 		public function moveStep():void
 		{
-//			trace(mCurrState);
+//			trace(getState());
 			if (COLLAPSING==getState() || EXTENDING==getState())
 			{
-				this.moveMatrix = this.pendingMovements[this.movementIndex];
-				this.movementIndex++;
+				if(this.movementIndex<this.pendingMovements.length)
+					this.moveMatrix = this.pendingMovements[this.movementIndex];
 //				trace("mCurrState:"+mCurrState+", movePercentage:"+movementIndex+", pendingMovements.length:"+pendingMovements.length);
 			}
-			var percentage = (this.movementIndex * 3) / this.pendingMovements.length;
-			this.movePercentage = percentage<0.3?percentage:(percentage>2.7?(percentage-3)/-1:0.3);
 		}
 		
 		public function setState(state:uint)
 		{
-			ThreeDApp.output("set to state:"+state);
+//			trace("set to state:"+state);
 			mCurrState=state;
 		}
 		public function getState()
@@ -269,13 +266,14 @@
 			for(var jumpIndex:Number=1;jumpIndex<jumpLength;jumpIndex++)
 			{
 				this.pendingMovements[jumpIndex]=new ThreeDMatrix();
-				var multiplier:Number=1/(jumpIndex+1);
+				var multiplier:Number=jumpIndex/jumpLength;
 				var currVec:ThreeDPoint = new ThreeDPoint(dir.x*multiplier, dir.y*multiplier, dir.z*multiplier);
-				
-				var transMat:ThreeDMatrix=new ThreeDMatrix();
-				transMat.translate(currVec.x, currVec.y, currVec.z);
-				this.pendingMovements[jumpIndex] = formerMat = formerMat.mul(transMat);
+//				trace("multiplier:"+multiplier+", currVec"+currVec);
+				this.pendingMovements[jumpIndex].translate(currVec.x, currVec.y, currVec.z);
 			}
+			//trace("pendingMovements");
+			//for each(var mat in pendingMovements)
+				//trace(mat.Translation());
 		}
 
 		public function jump():void //dirIndex:Number
