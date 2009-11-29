@@ -9,13 +9,6 @@
 
 	public class Polygon extends DrawElement
 	{
-		private const COLLAPSED:uint = 0,
-			EXTENDING:uint = 1,
-			EXTENDED:uint = 2,
-			COLLAPSING:uint = 3;
-		private var mCurrState:uint;
-
-		private var parentObj:ThreeDObject;
 		public var unsortedIndex:Number;
 		public var pointIndices:Array;
 		public var adjacencyIndices:Array;
@@ -32,13 +25,12 @@
 	// movement related things
 		public var faceNormal:ThreeDPoint;
 		public var moveMatrix:ThreeDMatrix; 
-		public var pendingMovements:Array;	
-		public var movementIndex:Number=0;
-		public var moving:Boolean=false;
+		public var pointMoveIndices:Array;
 		public var otherElementParts:Array;
 		
 		public function Polygon(points_p:Array, unsortedIndex:uint, parent:ThreeDObject=undefined, normals:Array=undefined, copyPropsFrom:Polygon=undefined):void{
 			this.pointIndices = points_p;
+			this.pointMoveIndices = new Array(points_p.length);
 			this.parentObj = parent;
 			this.unsortedIndex = unsortedIndex;
 			if(normals!=undefined)
@@ -48,7 +40,7 @@
 					normalIndices[normalCopy] = normals[normalCopy];
 			}
 			if(parent!=undefined)
-				this.colour = parent.colour;
+				this.colour = parent.currColour;
 	//		this.calcDepth();
 			if(copyPropsFrom!=undefined)
 			{
@@ -57,10 +49,8 @@
 				colour = copyPropsFrom.colour;
 			}
 			alpha = 0.8;
-			pendingMovements = new Array(0);
 			moveMatrix = new ThreeDMatrix();
 			otherElementParts = new Array();
-			mCurrState = COLLAPSED;
 		}
 		
 		public function calcFaceNormal():void
@@ -181,41 +171,7 @@
 			return true;
 		}
 
-		public function processStates():void
-		{
-//			trace(mCurrState);
-			if(EXTENDING==getState())//this.movementIndex<this.pendingMovements.length)
-			{
-				this.moving=true;
-				colour = mouseOverColour;
-				if(this.movementIndex==this.pendingMovements.length)
-				{
-//					trace("this.movementIndex==this.pendingMovements.length");
-					setState(EXTENDED);
-				}
-				else
-					this.movementIndex++;
-			}
-			else if(COLLAPSING==getState())
-			{
-				if(this.movementIndex<=0)
-				{
-					setState(COLLAPSED);
-					this.movementIndex = 0;
-					this.moving=false;
-
-					if(parentObj!=undefined)
-					{
-						parentObj.ResetMovingPolyIndex(this.unsortedIndex);
-						colour = parentObj.inactiveColour;
-					}
-					ThreeDCanvas.rotFlag = true;
-				}
-				else
-					this.movementIndex--;
-			}
-		}
-		public function moveStep():void
+		public override function moveStep():void
 		{
 //			trace(getState());
 			if (COLLAPSING==getState() || EXTENDING==getState())
@@ -226,39 +182,37 @@
 			}
 		}
 		
-		public function setState(state:uint)
-		{
-//			trace("set to state:"+state);
-			mCurrState=state;
-		}
-		public function getState()
-		{
-			return mCurrState;
-		}
-		
 		public function getGlowPercentage():Number
 		{
 			return parentObj.glowPercentage;
 		}
 
-		public function Process(parent:ThreeDObject):void
+		public override function Process(parent:ThreeDObject=undefined):void
 		{
-			this.parentObj = parent;
-			processStates();
-			moveStep();
+			super.Process(parent);
 			if(moving)
 			{
 				parent.SetMovingPolyIndex(this.unsortedIndex);
 			}
-			colour = parentObj.colour;
+			currColour = parentObj.currColour;
+		}
+		
+		public override function OnCollapsed():void
+		{
+			if(parentObj!=undefined)
+			{
+				parentObj.ResetMovingPolyIndex(this.unsortedIndex);
+				currColour = parentObj.inactiveColour;
+			}
+			super.OnCollapsed();
 		}
 
-		public function calcMovements():void
+		public override function calcMovements():void
 		{
 			var dir:ThreeDPoint = this.faceNormal;
 			dir.normalize(10);
 
-			this.movementIndex=0;
+//			this.movementIndex=0;
 			this.pendingMovements=new Array();
 
 			var formerMat:ThreeDMatrix = moveMatrix;
@@ -274,17 +228,6 @@
 			//trace("pendingMovements");
 			//for each(var mat in pendingMovements)
 				//trace(mat.Translation());
-		}
-
-		public function jump():void //dirIndex:Number
-		{
-			if(mCurrState==COLLAPSED)
-			{
-				calcMovements();
-				setState(EXTENDING);
-			}
-			else
-				setState(COLLAPSING);
 		}
 
 		public function draw(points:Array, normals:Array=undefined):void
@@ -310,23 +253,24 @@
 //					else 
 			graphics.lineStyle(1, parentObj.borderColour, 1);
 			// move to first Point
-			var endPoint:ThreeDPoint = points[pointIndices[0]];
+			var indices:Array = moving?pointMoveIndices:pointIndices;
+			var endPoint:ThreeDPoint = points[indices[0]];
 			if(endPoint==undefined)
 			{	
-				trace("error at point "+pointIndices[0]);
+				trace("error at point "+indices[0]);
 				return;
 			}
 //			trace("pointIndices:"+pointIndices);
 			graphics.moveTo(endPoint.x, endPoint.y);
 			
-			for(var vertIndex:Number=1;vertIndex<=pointIndices.length;vertIndex++){
-				var index:Number =  vertIndex<pointIndices.length?vertIndex:0;
+			for(var vertIndex:Number=1;vertIndex<=indices.length;vertIndex++){
+				var index:Number =  vertIndex<indices.length?vertIndex:0;
 				// on purpose vertIndex and index as index gets set yo 0 
-				var renderTheEdge:Boolean = parentObj.renderEdge(pointIndices[vertIndex-1], pointIndices[index]);
-				var currPoint:ThreeDPoint = points[pointIndices[index]];
+				var renderTheEdge:Boolean = parentObj.renderEdge(indices[vertIndex-1], indices[index]);
+				var currPoint:ThreeDPoint = points[indices[index]];
 				if(currPoint==undefined)
 				{	
-					trace("error at point "+pointIndices[index]);
+					trace("error at point "+indices[index]);
 					continue;
 				}
 				//trace("vertIndex:"+vertIndex+", currPoint:"+currPoint.x+", "+currPoint.y);
@@ -353,11 +297,6 @@
 		
 		public function tracePoints():void{
 			trace("Polygon:"+pointIndices+"\n");
-		}
-	
-		public function GetState():uint
-		{
-			return mCurrState;
 		}
 	}
 	

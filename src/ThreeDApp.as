@@ -12,6 +12,7 @@ package
 	import flash.text.*;
 	import flash.utils.Timer;
 	import ThreeDPack.*;
+	import flash.system.Security;
 
 	/**
 	 * @author gunnar
@@ -21,6 +22,9 @@ package
 	public class ThreeDApp extends Sprite
 	{
 		public var noiseSeed:Number = 0;
+		
+		Security.allowDomain("localhost");
+//		Security.allowDomain("www.gunnardroege.de");
 		
 		// Elements
 		public static var elements:Sprite;

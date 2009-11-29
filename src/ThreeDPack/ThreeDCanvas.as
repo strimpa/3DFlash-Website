@@ -27,7 +27,7 @@
 		
 		var colour:Number;
 		
-		static var rotFlag:Boolean = false;
+		static var rotFlag:Boolean = true;
 		var currRot:Number=0;
 		public static var dragRot:Number;
 		public static var worldXRot:Number = 180;
@@ -170,7 +170,7 @@
 									new ThreeDPoint(1,500,0),
 									new ThreeDPoint(-1,500,0));
 			mast.addPoly(new Polygon(new Array(0,1,3,2), 0, mast));
-			mast.colour = 0xFFFFFF;
+			mast.currColour = 0xFFFFFF;
 			mast.borderColour = 0x3D3F3D;
 			mast.isMovable = false;
 			
@@ -256,10 +256,6 @@
 		{
 			worldMatrix.rotate( 0,dragRot-=currRot,0 );
 			currRot/=2;
-//			if(rotFlag)
-//			{
-//				currRot--;
-//			}
 			for(var objIndex:Number=0; objIndex<allObjects.length; objIndex++)
 			{
 				if(!allObjects[objIndex].isActive())
@@ -271,9 +267,12 @@
 		
 		public function mouseRotate(rot:Point)
 		{
+			if (rotFlag)
+			{
 				//dragRot=dragRot.add(rot);
 				//trace("dragRot:"+dragRot);
 				currRot += rot.y;
+			}
 		}
 		
 		public function draw(event:Event):void
@@ -337,7 +336,7 @@
 //			glowSprite.addChild(currGlowChild);
 			for(var drawListIndex:Number=0; drawListIndex<drawList.length; drawListIndex++)
 			{
-				if (drawList[drawListIndex].getState() != ThreeDObject.COLLAPSED)
+				if (drawList[drawListIndex].getState() != DrawElement.COLLAPSED)
 				{
 					selectedSprite.addChild(drawList[drawListIndex]);
 				}

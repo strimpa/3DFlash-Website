@@ -5,6 +5,21 @@ package ThreeDPack
 
 	public class DrawElement extends Sprite
 	{
+		public static const COLLAPSED:uint = 0,
+			EXTENDING:uint = 1,
+			EXTENDED:uint = 2,
+			COLLAPSING:uint = 3,
+			NONE:uint = 4;
+		protected var parentObj:ThreeDObject;
+		private var mCurrState:uint;
+		public var pendingMovements:Array;	
+		public var movementIndex:Number=0;
+		public var moving:Boolean=false;
+		public var isMovable:Boolean = true;
+		private var callback:Function = null;
+		private var callbackEvent:uint = NONE;
+
+		public var currColour:Number;
 		public var mouseOverColour:Number = 0x4f3333;
 		public var movingColour:Number = 0x3F3333;
 		public var inactiveColour = 0x333333;
@@ -27,6 +42,8 @@ package ThreeDPack
 			this.addEventListener(MouseEvent.MOUSE_DOWN, mouseClickHandler, false, 0);
 			mouseIsDown = false;
 			moveDelta = new ThreeDPoint();
+			this.pendingMovements = new Array();
+			setState(COLLAPSED);
 		}
 
 		public function mouseOverHandler(event:MouseEvent):void
@@ -66,8 +83,111 @@ package ThreeDPack
 			}
 		}
 		
+		public function setCallback(event:uint, cb:Function):void
+		{
+			this.callbackEvent = event;
+			this.callback = cb;
+		}
+		
+		private function useCallback(event:uint):void
+		{
+			if(event==this.callbackEvent && this.callback)
+			{
+				callback();
+				callbackEvent = NONE;
+				callback = null;
+			}
+		}
+		
 		public function MouseDragHandler(event:MouseEvent):void
 		{
 		} 
+
+		public function processStates():void
+		{
+//			trace(mCurrState);
+			if(EXTENDING==getState())//this.movementIndex<this.pendingMovements.length)
+			{
+				this.moving=true;
+				currColour = mouseOverColour;
+				if(this.movementIndex==this.pendingMovements.length)
+				{
+//					trace("movementIndex:"+movementIndex+", pendingMovements.length:"+pendingMovements.length);
+					setState(EXTENDED);
+					OnExtended();
+				}
+				else
+					this.movementIndex++;
+
+				moveStep();
+			}
+			else if(COLLAPSING==getState())
+			{
+				if(this.movementIndex<=0)
+				{
+					setState(COLLAPSED);
+					OnCollapsed();
+					this.movementIndex = 0;
+					this.moving=false;
+				}
+				else
+				{
+					if (this.movementIndex == this.pendingMovements.length)
+						OnCollapsing();
+					this.movementIndex--;
+				}
+
+				moveStep();
+			}
+		}
+		
+		public function OnExtended():void
+		{
+			useCallback(EXTENDED);
+		}
+		
+		public function OnCollapsed():void
+		{
+			useCallback(COLLAPSED);
+		}
+
+		public function OnCollapsing():void
+		{
+			useCallback(COLLAPSING);
+		}
+
+		public function Process(parent:ThreeDObject=undefined):void
+		{
+			this.parentObj = parent;
+			processStates();
+		}
+
+		public function moveStep():void
+		{
+		}
+		
+		public function calcMovements():void
+		{ /* to be overridden */ }
+		
+		public function jump():void //dirIndex:Number
+		{
+			if(mCurrState==COLLAPSED||mCurrState==COLLAPSING)
+			{
+				calcMovements();
+				setState(EXTENDING);
+			}
+			else
+				setState(COLLAPSING);
+		}
+
+		public function setState(state:uint):void
+		{
+//			trace("set to state:"+state);
+			mCurrState=state;
+		}
+		public function getState():uint
+		{
+			return mCurrState;
+		}
 	}
 }

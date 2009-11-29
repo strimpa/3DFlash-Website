@@ -20,7 +20,7 @@
 		public function loadItem(item:String)
 		{
 			objectName = item;
-			load(new URLRequest(item));
+			load(new URLRequest("http://localhost/website/3DEngine/bin/"+item));
 		}
 
         private function configureListeners(dispatcher:IEventDispatcher):void {

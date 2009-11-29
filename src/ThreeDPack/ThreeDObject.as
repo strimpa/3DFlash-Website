@@ -6,13 +6,6 @@
 
 	public class ThreeDObject extends DrawElement
 	{
-		public static const 	COLLAPSED:uint = 0,
-						EXTENDING:uint = 1,
-						EXTENDED:uint = 2,
-						COLLAPSING:uint = 3;
-		private var mCurrState:uint;
-
-		public var isMovable:Boolean = true;
 		public var points:Array;
 		public var renderPoints:Array;
 		public var normalsCalculated:Boolean;
@@ -27,9 +20,7 @@
 		var edgeSmoothing:Array;
 		
 		public var myMatrixStack:Array;
-		public var pendingMovements:Array;	
-		public var movementIndex:Number=0;
-		public var moving:Boolean=false;
+		public var splitPolysOnMovement:Boolean = true;
 
 		public var glowPercentage = 0;
 		public var glowFactor = 0;
@@ -41,7 +32,6 @@
 		public var lastForceVector:ThreeDPoint = undefined;
 		public var forceDecay:Number = 0;
 		
-		public var colour:Number;
 		public var paintIndex:Array;			// temoral index in array newObjects
 		public var pics:Array;
 
@@ -54,15 +44,13 @@
 			this.renderPoints = new Array();
 			this.renderNormals = new Array();
 			this.polygons = new Array(0);
-			this.pendingMovements = new Array();
 			this.paintIndex = new Array();
 			// rotation & translation
 			// scaled local transformation | scheduled local transformation | static world transformation
 			this.myMatrixStack = new Array(new ThreeDMatrix());
 			this.depth=0;
-			this.colour = 0x333333;
+			currColour = 0x333333;
 			this.borderColour = 0x3D3F3D;
-			this.mCurrState = COLLAPSED;
 			this.position = new ThreeDPoint(0,0,0);
 			this.active = true;
 		}
@@ -83,12 +71,12 @@
 			if(!isMovable)
 				return;
 			if(mouseOver)
-				this.colour = mouseOverColour;
+				this.currColour = mouseOverColour;
 			else
-				this.colour = inactiveColour;
+				this.currColour = inactiveColour;
 			for(var jumpIndex=0;jumpIndex<this.polygons.length;jumpIndex++)
 			{
-				this.polygons[jumpIndex].colour = this.colour;
+				this.polygons[jumpIndex].currColour = this.currColour;
 			}
 		}
 		
@@ -154,7 +142,8 @@
 			}
 			if(currMovingPolyIndeces!=undefined)
 			{
-				currMovingPolyPoints = new Array(points.length);
+				currMovingPolyPoints = new Array();
+				var newVertIndex = 0;
 				for(var movingPolyIndex:Number=0;movingPolyIndex<currMovingPolyIndeces.length;movingPolyIndex++)
 				{
 					var movingPoly:Polygon = polygons[currMovingPolyIndeces[movingPolyIndex]];
@@ -167,29 +156,30 @@
 					if (movingPoly.moveMatrix != undefined)
 					{
 						polyMatrixStack[0] = movingPoly.moveMatrix;
-						trace(polyMatrixStack[0].Translation());
+//						trace(polyMatrixStack[0].Translation());
 					}
 					else 
 						trace("No object transformation matrix!");
 					polyMatrixStack = polyMatrixStack.concat(matrixStack);
 					for(var pointIndex:Number=0;pointIndex<movingPoly.pointIndices.length;pointIndex++)
 					{
-						var currIndex:Number = movingPoly.pointIndices[pointIndex]; 
-						if(pointAlreadyCalculated[currIndex]!="yes")
+						var currOriginalIndex:Number = movingPoly.pointIndices[pointIndex]; 
+						var newIndex:uint = movingPoly.pointMoveIndices[pointIndex] = splitPolysOnMovement?newVertIndex++:currOriginalIndex;
+						if(splitPolysOnMovement || pointAlreadyCalculated[currOriginalIndex]!="yes")
 						{
-							currMovingPolyPoints[currIndex] = goThroughPoints(polyMatrixStack, points[movingPoly.pointIndices[pointIndex]]);
-							trace("currIndex:"+currIndex+", "+currMovingPolyPoints[currIndex]);
-							pointAlreadyCalculated[currIndex]="yes";
+							currMovingPolyPoints[newIndex] = goThroughPoints(polyMatrixStack, points[currOriginalIndex]);
+//							trace("currIndex:"+currOriginalIndex+", "+currMovingPolyPoints[currOriginalIndex]);
+							pointAlreadyCalculated[currOriginalIndex]="yes";
 						}
-						else
-							trace("pointAlreadyCalculated:"+currIndex);
+						//else
+							//trace("pointAlreadyCalculated:"+currOriginalIndex);
 					}
 	//				trace("currMovingPolyPoints[0]:"+currMovingPolyPoints[0]);
 				}
 				//trace("currMovingPolyPoints");
 				//for each(var point in currMovingPolyPoints)
 					//trace(point);
-				movingPointsCalculated = true;
+				//movingPointsCalculated = true;
 			}
 //			sort();
 			calcDepth();
@@ -325,7 +315,7 @@
 			ThreeDApp.SetOverObject();
 			if(!moving)
 			{
-				colour = mouseOverColour;
+				currColour = mouseOverColour;
 			}
 			super.mouseOverHandler(event);
 		}
@@ -336,7 +326,7 @@
 				return;
 			if(!moving)
 			{
-				colour = inactiveColour;
+				currColour = inactiveColour;
 			}
 			super.mouseOutHandler(event);
 		}
@@ -350,7 +340,7 @@
 		{
 		}
 		
-		public function Process():void
+		public override function Process(parent:ThreeDObject=undefined):void
 		{
 			this.currMovingPolyIndeces=undefined;
 			for(var moveIndPoly:Number=0;moveIndPoly<polygons.length;moveIndPoly++)
@@ -360,16 +350,12 @@
 			if(this.currMovingPolyIndeces==undefined)
 				this.movingPointsCalculated=false;
 				
-			processStates();
-			moveStep();
-			
+			super.Process();
+				
 			if(!isMovable)
 				return;
 			
-//			if(moving)
-//				colour = movingColour;
-			
-			if(colour==mouseOverColour)
+			if(currColour==mouseOverColour)
 				glowFactor = 1;
 			else
 				glowFactor = -1;
@@ -379,54 +365,14 @@
 				this.glowPercentage -= 0.25;
 		}
 		
-		public function processStates():void
+		public override function moveStep():void
 		{
-			if(!isMovable)
-				return;
-//			trace("length:"+this.pendingMovements.length);
-//			trace("mCurrState:"+mCurrState+", movementIndex:"+movementIndex);
-			if(EXTENDING==getState())//this.movementIndex<this.pendingMovements.length)
-			{
-				this.moving=true;
-				if(jumpLength==this.movementIndex)
-				{
-					setState(EXTENDED);
-				}
-				else
-					this.movementIndex++;
-			}
-			else if(COLLAPSING==getState())
-			{
-				if(this.movementIndex<=0)
-				{
-					setState(COLLAPSED);
-					ThreeDApp.keywords.resetPositions();
-					this.movementIndex = 0;
-					this.moving=false;
-				}
-				else
-					this.movementIndex--;
-			}
-		}
-		
-		public function moveStep():void
-		{
-			if(mCurrState==COLLAPSING || mCurrState==EXTENDING)
+			if(getState()==COLLAPSING || getState()==EXTENDING)
 				if(this.movementIndex<this.pendingMovements.length)
 					this.myMatrixStack[0]=this.pendingMovements[this.movementIndex];
 //				else
 //					trace("this.movementIndex>=this.pendingMovements.length");
 			// Force
-		}
-		
-		public function setState(state:uint)
-		{
-//			ThreeDApp.output("set to state:"+state);
-			mCurrState=state;
-		}
-		public function getState()
-		{
-			return mCurrState;
 		}
 		
 		public function ApplyForce(vector:ThreeDPoint)
@@ -437,10 +383,10 @@
 			forceDecay = 1;
 		}
 		
-		public function calcMovements():void
+		public override function calcMovements():void
 		{
 			// reseting values
-			this.movementIndex=0;
+//			this.movementIndex=0;
 			this.pendingMovements=new Array();
 			
 			var formerMat:ThreeDMatrix = this.myMatrixStack[0];
@@ -458,19 +404,6 @@
 //				{
 //					polygons[jumpPolyIndex].jump();
 //				}
-		}
-		
-		public function jump():void //dirIndex:Number
-		{
-			if(!isMovable)
-				return;
-			if(mCurrState==COLLAPSED)
-			{
-				calcMovements();
-				setState(EXTENDING);
-			}
-			else
-				setState(COLLAPSING);
 		}
 		
 		public function printDepths():void

@@ -1,6 +1,7 @@
 ﻿package ThreeDPack
 {
 	import flash.events.MouseEvent;
+    import flash.external.ExternalInterface;
 	import flash.display.Sprite;
 	import flash.geom.Point;
 	import flash.text.*;
@@ -18,7 +19,7 @@
 		
 		var moveToCamIter:int = 0;
 		var moveToCamera:uint = 0;
-		const CAM_MOVE_LENGTH = 30;
+		const CAM_MOVE_LENGTH = 10;
 		
 		public function Cube(size_p:Number, pos:ThreeDPoint, content=undefined)
 		{
@@ -53,10 +54,10 @@
 //										new Polygon(new Array(0,6,4), 11, this)
 //													);
 			this.polygons = new Array(	new Polygon(new Array(0,1,3,2), 0, this),
-										new Polygon(new Array(0,1,5,4), 1, this),
-										new Polygon(new Array(4,5,7,6), 2, this),
+										new Polygon(new Array(4,5,1,0), 1, this),
+										new Polygon(new Array(6,7,5,4), 2, this),
 										new Polygon(new Array(2,3,7,6), 3, this),
-										new Polygon(new Array(1,3,7,5), 4, this),
+										new Polygon(new Array(5,7,3,1), 4, this),
 										new Polygon(new Array(0,2,6,4), 5, this)
 													);
 
@@ -87,10 +88,6 @@
 		{
 			var currState = getState();
 			super.mouseClickHandler(event);
-
-			trace("click");
-			for each(var poly:Polygon in polygons)
-				poly.jump();
 
 			if(!isActive() || currState!=COLLAPSED)
 				return;
@@ -154,13 +151,14 @@
 		
 		public override function calcMovements():void
 		{
-			/* per-frame calculation of movements*/
+			/* dummy array for per-frame calculation of movements */
+			pendingMovements = new Array(10);
 		}
 		
 		public override function moveStep():void
 		{
 			var invWVMatrix:ThreeDMatrix = ThreeDCanvas.GetWorldViewMatrix().Inverse();
-			var cameraFocusPoint:ThreeDPoint = new ThreeDPoint(0,0,-400).mul(invWVMatrix);//-400
+			var cameraFocusPoint:ThreeDPoint = new ThreeDPoint(0,0,-410).mul(invWVMatrix);//-400
 			var movePerc:Number = this.movementIndex /CAM_MOVE_LENGTH;
 			var dist:ThreeDPoint = cameraFocusPoint.minus(mPos);
 			dist.scale(movePerc);
@@ -176,13 +174,18 @@
 			else
 				myMatrixStack[2].Identity();
 			myMatrixStack[2].SetTranslationVec(newPos);
-			
-			this.myMatrixStack[1].ScaleValues(0.9);
-			super.moveStep();
+
+//			super.moveStep();
 		}
 
-		public override function Process():void
+		public override function Process(parent:ThreeDObject=undefined):void
 		{
+			super.Process();
+
+			if (getState() == EXTENDING)
+				ThreeDCanvas.rotFlag = false;
+			else if (getState() == COLLAPSING)
+				ThreeDCanvas.rotFlag = true;
 //			trace("mouseIsOverMe : "+mouseIsOverMe);
 			if(!mouseIsOverMe)
 			{
@@ -191,9 +194,53 @@
 				TitleFieldManager.fadeOutTitle(myTitleSprite);
 				mouseIsOverMe = true;
 			}
-			
-			super.Process();
-		} 
+			this.myMatrixStack[1].ScaleValues(0.8);
+		}
+		
+		public override function OnExtended():void
+		{
+			for each(var poly:Polygon in polygons)
+				poly.jump();
+			polygons[0].setCallback(EXTENDED, this.showContent);
+			super.OnExtended();
+		}
+		
+		public function showContent():void
+		{
+			if (ExternalInterface.available)
+			{
+				try{
+					ExternalInterface.call("showContentWindow");
+				}catch (e:Error){
+					ThreeDApp.output(e.getStackTrace());
+				}
+			}
+		}
+		
+		override public function jump():void 
+		{
+			if(polygons[0].getState()==COLLAPSED)
+				super.jump();
+			else
+			{
+				for each(var poly:Polygon in polygons)
+					poly.jump();
+				polygons[0].setCallback(COLLAPSED, this.jump);
+			}
+		}
+
+		public override function OnCollapsing():void
+		{
+			if (ExternalInterface.available)
+			{
+				//try{
+					//ExternalInterface.call("hideContentWindow");
+				//}catch (e:Error){
+					//ThreeDApp.output(e.getStackTrace());
+				//}
+			}
+			super.OnCollapsing();
+		}
 
 		function invokeTitleShow():void
 		{
