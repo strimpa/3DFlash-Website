@@ -18,14 +18,20 @@ package {
 			mLoader = new TargetLoadVars(this);
 		}
 		
-		private function Load():void
+		public function load():void
 		{
-			mLoader.loadItem("html\FancyChecker\FancyChecker.html");
+			mLoader.loadItem("html/FancyChecker/FancyChecker.html");
 		}
 		
-		private function onData(data:Object):void
+		public function onData(data:Object):void
 		{
-			this.htmlText = (data as String);
+//			trace((data as String));
+			var xmlitem:XML = XML(data as String);
+			var list:XMLList = xmlitem.body.div.children();
+			trace("list.length()"+list.length());
+			for each(var child in list)
+				trace(child.toString());
+//			this.htmlText = (data as String);
 		}
 		
 	}

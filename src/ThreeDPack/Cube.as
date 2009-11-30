@@ -207,13 +207,14 @@
 		
 		public function showContent():void
 		{
+			this.myContent.load();
 			if (ExternalInterface.available)
 			{
-				try{
-					ExternalInterface.call("showContentWindow");
-				}catch (e:Error){
-					ThreeDApp.output(e.getStackTrace());
-				}
+				//try{
+					//ExternalInterface.call("showContentWindow");
+				//}catch (e:Error){
+					//ThreeDApp.output(e.getStackTrace());
+				//}
 			}
 		}
 		

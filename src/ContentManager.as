@@ -12,7 +12,7 @@ package
 	public class ContentManager {
 		
 		static var contentXML:XML = new XML();
-		const text:uint = 0, swf:uint = 1;
+		const xml:uint = 0, swf:uint = 1, sceneData = 2;
 		const target:uint = 0, type:uint = 1, storage:uint = 2, callback:uint = 3;
 		var loadVars:TargetLoadVars;
 		var loadSwf:TargetLoad;
@@ -20,8 +20,8 @@ package
 			LoadObject("bg.jpg", swf, undefined, ThreeDApp.addToBackground),
 			LoadObject("baloo.swf", swf, undefined, ThreeDApp.addToBackground),
 			LoadObject("FontLoad.swf", swf, undefined, fontInit),
-			LoadObject("content.xml", text, contentXML, ThreeDApp.InitCanvas),
-			LoadObject("skull.obj", text, undefined, ThreeDPack.Obj2As.onData),
+			LoadObject("content.xml", xml, contentXML, ThreeDApp.InitCanvas),
+			LoadObject("skull.obj", sceneData, undefined, ThreeDPack.Obj2As.onData),
 			LoadObject("keywords.swf", swf, undefined, ThreeDApp.keywords.onData)
 			];
 //		var queue:Array;
@@ -116,7 +116,7 @@ package
 			if(item == undefined)
 				return;
 			trace(item);
-			if(item[type] == text)
+			if(item[type] == xml || item[type] == sceneData)
 				loadVars.loadItem(item[target]);
 			else
 				loadSwf.loadItem(item[target]);
