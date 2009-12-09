@@ -29,7 +29,8 @@
             dispatcher.addEventListener(ProgressEvent.PROGRESS, progressHandler);
             dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
             dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
-            dispatcher.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
+//            dispatcher.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
+			dispatcher.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler, false, 0, true);
         }
 
         private function completeHandler(event:Event):void {
@@ -60,6 +61,7 @@
 
         private function ioErrorHandler(event:IOErrorEvent):void {
             trace("ioErrorHandler: " + event + " for object " + objectName);
+			event.stopPropagation();
         }
 		
 		public function onData(src:String):void

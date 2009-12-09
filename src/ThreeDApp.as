@@ -69,14 +69,14 @@ package
 			txtFieldMgr = new TitleFieldManager();
 			lastDragPos = new Point(0,0);
 			
+			CreateOutput();
+			output("starting creation");
+			output("loading background");
+
 			elements = new Sprite();
 			addChild(elements);
 			overlaySprite = new Sprite();
 			addChild(overlaySprite);
-
-			CreateOutput();
-			output("starting creation");
-			output("loading background");
 
 			CreateBG();
 			output("create mask");
@@ -301,7 +301,7 @@ package
 			stateOutput.height = 300;
 			stateOutput.multiline = true;
 			stateOutput.selectable = false;
-			stateOutput.defaultTextFormat = globals.textformatsmall;
+			stateOutput.defaultTextFormat = globals.textformatSmall;
 			stateOutput.text = "output created\n";
 			addChild(stateOutput);
 		} 

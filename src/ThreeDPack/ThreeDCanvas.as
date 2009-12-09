@@ -24,6 +24,8 @@
 		public static var drawListSprite:Sprite;
 		public static var glowSprite:Sprite;
 		public static var selectedSprite:Sprite;
+		private static var exitSprite:Sprite;
+		private static var currActiveCube:Cube;
 		
 		var colour:Number;
 		
@@ -106,10 +108,32 @@
 			selectedSprite.cacheAsBitmap = true;
 			addChild(selectedSprite);
 			
-			drawListSprite.mask = ThreeDApp.CreateMask(ThreeDApp.spectrumMiddle);
+//			drawListSprite.mask = ThreeDApp.CreateMask(ThreeDApp.spectrumMiddle);
 			
+			exitSprite = new Sprite();
+			//exitSprite.graphics.beginFill(0xFF0000);
+			//exitSprite.graphics.drawRect(0, 0, 50, 50);
+			//exitSprite.graphics.endFill();
+			exitSprite.addEventListener(MouseEvent.CLICK, exitHandler);
+			exitSprite.x = 700;
+			exitSprite.y = 100;
 //			this.cacheAsBitmap = true;
 			
+		}
+		
+		public static function exitSpriteLoaded(data:Object):void
+		{
+			exitSprite.addChild(data as Sprite);
+		}
+		public static function showExitSprite(cube:Cube):void
+		{
+			currActiveCube = cube;
+		}
+		
+		public function exitHandler(event:Event)
+		{
+			currActiveCube.jump();
+			currActiveCube = undefined;
 		}
 		
 		static public function appendToObjects(item:ThreeDObject):void
@@ -312,6 +336,10 @@
 				allObjects[objIndex].draw();
 			}//for
 			sortDrawList();
+			if (currActiveCube != undefined)
+			{
+				glowSprite.addChild(exitSprite);
+			}
 			//painting
 			
 			//trace("liength "+drawList.length);

@@ -355,14 +355,19 @@
 			if(!isMovable)
 				return;
 			
-			if(currColour==mouseOverColour)
-				glowFactor = 1;
+			if (getState() != EXTENDED)
+			{
+				if(currColour==mouseOverColour)
+					glowFactor = 1;
+				else
+					glowFactor = -1;
+				if(glowFactor>0 && glowPercentage<1)
+					this.glowPercentage += 0.2;
+				else if(glowFactor<0 && glowPercentage>0)
+					this.glowPercentage -= 0.25;
+			}
 			else
-				glowFactor = -1;
-			if(glowFactor>0 && glowPercentage<1)
-				this.glowPercentage += 0.2;
-			else if(glowFactor<0 && glowPercentage>0)
-				this.glowPercentage -= 0.25;
+				glowPercentage = 0;
 		}
 		
 		public override function moveStep():void

@@ -27,7 +27,8 @@ package
 				mTitleTextFields[tf] = new Sprite();
 				var field = new TextField();
 				field.name = "textfield";
-				field.defaultTextFormat = globals.textformatmenutitle;
+				field.defaultTextFormat = globals.textformatMenuTitle;
+				field.selectable = false;
 				field.autoSize = TextFieldAutoSize.LEFT;
 				field.embedFonts = true;
 				mTitleTextFields[tf].alpha = 0;

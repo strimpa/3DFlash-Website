@@ -2,10 +2,13 @@
 {
 	import flash.events.MouseEvent;
 	import flash.display.*;
+	import flash.events.TextEvent;
 	import flash.geom.Rectangle;
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	import flash.geom.Matrix;
+	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;
 
 	public class Polygon extends DrawElement
 	{
@@ -18,13 +21,16 @@
 		public var depth2:Number=0;
 		public var opacity:Number=100;
 		public var colour:Number;
+		private var titleField:TextField;
+		private var textSprite:Sprite;
+		private var textField:TextField;
 		
 	// new point calculation
 	//	var points:Array;
 	
 	// movement related things
 		public var faceNormal:ThreeDPoint;
-		public var moveMatrix:ThreeDMatrix; 
+		public var moveMatrix:ThreeDMatrix;
 		public var pointMoveIndices:Array;
 		public var otherElementParts:Array;
 		
@@ -40,7 +46,10 @@
 					normalIndices[normalCopy] = normals[normalCopy];
 			}
 			if(parent!=undefined)
-				this.colour = parent.currColour;
+				this.colour = Math.random() * 255 | 
+				((Math.random() * 255) << 8) |
+				((Math.random() * 255) << 16);
+				// parent.currColour;
 	//		this.calcDepth();
 			if(copyPropsFrom!=undefined)
 			{
@@ -51,6 +60,8 @@
 			alpha = 0.8;
 			moveMatrix = new ThreeDMatrix();
 			otherElementParts = new Array();
+			textSprite = new Sprite();
+			this.addChild(textSprite);
 		}
 		
 		public function calcFaceNormal():void
@@ -120,23 +131,23 @@
 			if(notMoveable())
 				return;
 			if(parentObj)
+			{
 				parentObj.mouseOverHandler(event);
-//			{
-				parentObj.setPolyColour(true);
-//			}
-//			super.mouseOverHandler(event);
+//				parentObj.setPolyColour(true);
+			}
+			super.mouseOverHandler(event);
 		}
 	
 		public override function mouseOutHandler(event:MouseEvent):void
 		{
 			if(notMoveable())
 				return;
-			if(parentObj && !moving)
+			if(parentObj)
+			{
 				parentObj.mouseOutHandler(event);
-//			{
 				parentObj.setPolyColour(false);
-//			}
-//			super.mouseOutHandler(event);
+			}
+			super.mouseOutHandler(event);
 		}
 		
 		public override function mouseClickHandler(event:MouseEvent):void
@@ -151,11 +162,21 @@
 //			super.mouseClickHandler(event);
 		}
 
+		public override function mouseUpHandler(event:MouseEvent):void
+		{
+			if(notMoveable())
+				return;
+			if(parentObj)
+				parentObj.mouseUpHandler(event);
+		}
+
 		public override function mouseMoveHandler(event:MouseEvent):void
 		{
 			if(notMoveable())
 				return;
 			super.mouseMoveHandler(event);
+			if(parentObj)
+				parentObj.mouseMoveHandler(event);
 			mouseOverHandler(event);
 		} 
 
@@ -179,6 +200,10 @@
 				if(this.movementIndex<this.pendingMovements.length)
 					this.moveMatrix = this.pendingMovements[this.movementIndex];
 //				trace("mCurrState:"+mCurrState+", movePercentage:"+movementIndex+", pendingMovements.length:"+pendingMovements.length);
+				if (textField)
+				{
+					textSprite.alpha = movementIndex / polyJumpLength;
+				}
 			}
 		}
 		
@@ -204,7 +229,76 @@
 				parentObj.ResetMovingPolyIndex(this.unsortedIndex);
 				currColour = parentObj.inactiveColour;
 			}
+			if(textField && textSprite.contains(textField))
+			{
+				textSprite.removeChild(textField);
+			}
+			removeChild(textSprite);
+			textField = undefined;
+//			trace("poly " + unsortedIndex + " collapsed");
 			super.OnCollapsed();
+		}
+
+		public override function OnCollapsing():void
+		{
+			super.OnCollapsing();
+		}
+		
+		public override function OnExtending():void
+		{
+			addChild(textSprite);
+			textSprite.alpha = 0;
+			super.OnExtending();
+		}
+		
+		public override function OnExtended():void
+		{
+			ThreeDCanvas.showExitSprite(this.parentObj as Cube);
+		}
+		
+		public function setText(text:String)
+		{
+			if(!textField)
+			{
+//				trace(text);
+				try
+				{
+					textField = new TextField();
+					textField.selectable = false;
+					textField.wordWrap = true;
+					textField.blendMode = BlendMode.LAYER;
+//					textField.defaultTextFormat = globals.textformatsmall;
+//					textField.embedFonts = true;
+					textSprite.addChild(Content.getBG());
+					textSprite.addChild(textField);
+					textField.styleSheet = Content.getStyle();
+					textField.htmlText = text;
+				}
+				catch (error:Error)
+				{
+					trace(error.getStackTrace());
+				}
+			}
+			else
+				trace("textfiled already there!");
+		}
+		public function setHeader(header:String):void
+		{
+			if(titleField && contains(titleField))
+				removeChild(titleField);
+			titleField = new TextField();
+			titleField.autoSize = TextFieldAutoSize.LEFT;
+			titleField.embedFonts = true;
+			titleField.defaultTextFormat = globals.textformatCubeTitle;
+			titleField.blendMode = BlendMode.LAYER;
+			this.addChild(titleField);
+			titleField.text = header;
+		}
+		public function resetHeader():void
+		{
+			if(titleField && contains(titleField))
+				removeChild(titleField);
+			titleField = undefined;
 		}
 
 		public override function calcMovements():void
@@ -215,12 +309,12 @@
 //			this.movementIndex=0;
 			this.pendingMovements=new Array();
 
-			var formerMat:ThreeDMatrix = moveMatrix;
+			var formerMat:ThreeDMatrix = new ThreeDMatrix();// moveMatrix;
 			this.pendingMovements[0] = formerMat;
-			for(var jumpIndex:Number=1;jumpIndex<jumpLength;jumpIndex++)
+			for(var jumpIndex:Number=1;jumpIndex<polyJumpLength;jumpIndex++)
 			{
 				this.pendingMovements[jumpIndex]=new ThreeDMatrix();
-				var multiplier:Number=jumpIndex/jumpLength;
+				var multiplier:Number=jumpIndex/polyJumpLength;
 				var currVec:ThreeDPoint = new ThreeDPoint(dir.x*multiplier, dir.y*multiplier, dir.z*multiplier);
 //				trace("multiplier:"+multiplier+", currVec"+currVec);
 				this.pendingMovements[jumpIndex].translate(currVec.x, currVec.y, currVec.z);
@@ -234,7 +328,7 @@
 		{
 			graphics.clear(); // clearing for drawing with shading
 			//currFace.blendMode = currFace.myObj.origObj.blendModes[currFace.myObj.originIndex[currFace.myIndex]];
-			graphics.beginFill(colour, 1/*myObj.polygons[polyIndex].opacity*/);
+			graphics.beginFill(currColour, 1/*myObj.polygons[polyIndex].opacity*/);
 //			var colouredBitmap:BitmapData = ThreeDApp.image.bitmapData.clone();//new BitmapData(600,400,true,0xFFFFFFFF);// = ThreeDApp.overlayBitmap;
 //			var matrix:Matrix = new Matrix(); 
 //			matrix.scale(1, 4);
@@ -263,6 +357,8 @@
 //			trace("pointIndices:"+pointIndices);
 			graphics.moveTo(endPoint.x, endPoint.y);
 			
+			var minPoint:Point = new Point(800,800);
+			var maxPoint:Point = new Point(0,0);
 			for(var vertIndex:Number=1;vertIndex<=indices.length;vertIndex++){
 				var index:Number =  vertIndex<indices.length?vertIndex:0;
 				// on purpose vertIndex and index as index gets set yo 0 
@@ -279,9 +375,27 @@
 				else
 					graphics.lineStyle(1, parentObj.borderColour, 0);
 				graphics.lineTo(currPoint.x, currPoint.y);
+				
+				minPoint.x = currPoint.x < minPoint.x ? currPoint.x : minPoint.x;
+				minPoint.y = currPoint.y < minPoint.y ? currPoint.y : minPoint.y;
+				maxPoint.x = currPoint.x > maxPoint.x ? currPoint.x : maxPoint.x;
+				maxPoint.y = currPoint.y > maxPoint.y ? currPoint.y : maxPoint.y;
 			}
 //			graphics.lineTo(endPoint.x, endPoint.y);
 			graphics.endFill();
+			
+			textSprite.x = minPoint.x;
+			textSprite.y = minPoint.y;
+			if (titleField)
+			{
+				titleField.x = minPoint.x;
+				titleField.y = minPoint.y - 30;
+			}
+			if (textField)
+			{
+				textField.width = maxPoint.x - minPoint.x;
+				textField.height = maxPoint.y - minPoint.y;
+			}
 			
 			if(ThreeDCanvas.drawNormals)
 			{

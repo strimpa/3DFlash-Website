@@ -5,11 +5,13 @@ package ThreeDPack
 
 	public class DrawElement extends Sprite
 	{
-		public static const COLLAPSED:uint = 0,
+		public static const 
+			COLLAPSED:uint = 0,
 			EXTENDING:uint = 1,
 			EXTENDED:uint = 2,
-			COLLAPSING:uint = 3,
-			NONE:uint = 4;
+			COLLAPSING:uint = 4,
+			NONE:uint = 8,
+			ANY:uint = 16;
 		protected var parentObj:ThreeDObject;
 		private var mCurrState:uint;
 		public var pendingMovements:Array;	
@@ -26,6 +28,7 @@ package ThreeDPack
 		public var borderColour:Number;
 		public var myObj:ThreeDObject;
 		public var jumpLength:Number = 10;
+		public var polyJumpLength:Number = 6;
 		public var myIndex:Number;
 		public static var mouseIsDown:Boolean;
 		public static var clickPoint:ThreeDPoint;
@@ -91,7 +94,8 @@ package ThreeDPack
 		
 		private function useCallback(event:uint):void
 		{
-			if(event==this.callbackEvent && this.callback)
+			if ( (event == this.callbackEvent || ANY == this.callbackEvent)
+					&& this.callback)
 			{
 				callback();
 				callbackEvent = NONE;
@@ -117,7 +121,11 @@ package ThreeDPack
 					OnExtended();
 				}
 				else
+				{
+					if (this.movementIndex == 0)
+						OnExtending();
 					this.movementIndex++;
+				}
 
 				moveStep();
 			}
@@ -155,6 +163,11 @@ package ThreeDPack
 		{
 			useCallback(COLLAPSING);
 		}
+		
+		public function OnExtending():void
+		{
+			useCallback(EXTENDING);
+		}
 
 		public function Process(parent:ThreeDObject=undefined):void
 		{
@@ -173,11 +186,26 @@ package ThreeDPack
 		{
 			if(mCurrState==COLLAPSED||mCurrState==COLLAPSING)
 			{
+				extend();
+			}
+			else
+				collapse();
+		}
+		
+		public function extend():void
+		{
+			if (getState() != EXTENDED)
+			{
 				calcMovements();
 				setState(EXTENDING);
 			}
-			else
+		}
+		public function collapse():void
+		{
+			if (getState() != COLLAPSED)
+			{
 				setState(COLLAPSING);
+			}
 		}
 
 		public function setState(state:uint):void

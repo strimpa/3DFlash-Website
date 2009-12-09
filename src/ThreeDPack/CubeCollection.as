@@ -52,7 +52,7 @@ package ThreeDPack
 			for each(var aCube:Cube in mCubes)
 			{
 //				trace("mCategory:"+aCube.myContent.mCategory+", keyword:"+keyword);
-				if(aCube.myContent.mCategory == keyword)
+				if(aCube.getContent().mCategory == keyword)
 					aCube.setActive(act);
 			}
 		}

@@ -12,7 +12,7 @@ package
 	public class ContentManager {
 		
 		static var contentXML:XML = new XML();
-		const xml:uint = 0, swf:uint = 1, sceneData = 2;
+		const xml:uint = 0, swf:uint = 1, sceneData:uint = 2, css:uint = 3;
 		const target:uint = 0, type:uint = 1, storage:uint = 2, callback:uint = 3;
 		var loadVars:TargetLoadVars;
 		var loadSwf:TargetLoad;
@@ -22,6 +22,9 @@ package
 			LoadObject("FontLoad.swf", swf, undefined, fontInit),
 			LoadObject("content.xml", xml, contentXML, ThreeDApp.InitCanvas),
 			LoadObject("skull.obj", sceneData, undefined, ThreeDPack.Obj2As.onData),
+			LoadObject("html/contentStyle_as.css", css, undefined, Content.contentStyleLoaded),
+			LoadObject("barock.swf", swf, undefined, Content.contentBGLoaded),
+			LoadObject("exit.swf", swf, undefined, ThreeDCanvas.exitSpriteLoaded),
 			LoadObject("keywords.swf", swf, undefined, ThreeDApp.keywords.onData)
 			];
 //		var queue:Array;
@@ -104,7 +107,7 @@ package
 			content.mTitle = xmlitem.title;
 			content.mCategory = xmlitem.category;
 			content.mKeywords = [xmlitem.keywords];
-//			content.mContentUrl = xmlitem.url;
+			content.mContentUrl = xmlitem.url;
 			return content;
 		}
 		
@@ -116,7 +119,7 @@ package
 			if(item == undefined)
 				return;
 			trace(item);
-			if(item[type] == xml || item[type] == sceneData)
+			if(item[type] == xml || item[type] == sceneData || item[type] == css)
 				loadVars.loadItem(item[target]);
 			else
 				loadSwf.loadItem(item[target]);
