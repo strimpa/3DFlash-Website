@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
 	<content>
-		<title>one</title>
+		<title>FancyChecker</title>
 		<category>1</category>
 		<keywords>1</keywords>
 		<description>1</description>
 		<url>html/FancyChecker/FancyChecker.html</url>
 		</content>
 	<content>
-		<title>two</title>
+		<title>23:50</title>
 		<category>2</category>
 		<keywords>3</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/2350/2350.html</url>
 	</content>
 	<content>
 		<title>three</title>

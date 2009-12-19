@@ -17,7 +17,8 @@
 //		public var moveVecs:Array;
 		public var depth:Number;
 		public var origObjInd:Number;
-		var edgeSmoothing:Array;
+		public var edgeSmoothing:Array;
+		public var currAlpha:Number;
 		
 		public var myMatrixStack:Array;
 		public var splitPolysOnMovement:Boolean = true;
@@ -53,11 +54,14 @@
 			this.borderColour = 0x3D3F3D;
 			this.position = new ThreeDPoint(0,0,0);
 			this.active = true;
+			currAlpha = 0;
 		}
 
 		function setActive(act:Boolean=true)
 		{
 			this.active = act;
+			if (act == false)
+				currAlpha = 0;
 //			trace("act? "+act);
 		}
 		
@@ -124,6 +128,12 @@
 			objToProj(matrixStack);
 			matrixStack.splice(0,myMatrixStack.length);
 			return this;
+		}
+		
+		public override function OnCollapsed():void
+		{
+			KeywordManager.resetPositions();
+			super.OnCollapsed();
 		}
 		
 		protected function objToProj(matrixStack:Array):void
@@ -368,6 +378,9 @@
 			}
 			else
 				glowPercentage = 0;
+				
+			currAlpha = isActive()? currAlpha+0.1 : currAlpha-0.1;
+			currAlpha = currAlpha<0?0:(currAlpha>1)?1:currAlpha;
 		}
 		
 		public override function moveStep():void

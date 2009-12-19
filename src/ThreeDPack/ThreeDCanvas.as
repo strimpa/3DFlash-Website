@@ -124,6 +124,7 @@
 		public static function exitSpriteLoaded(data:Object):void
 		{
 			exitSprite.addChild(data as Sprite);
+//			exitSprite.getChildAt(0).blendMode = BlendMode.MULTIPLY;
 		}
 		public static function showExitSprite(cube:Cube):void
 		{
@@ -194,8 +195,9 @@
 									new ThreeDPoint(1,500,0),
 									new ThreeDPoint(-1,500,0));
 			mast.addPoly(new Polygon(new Array(0,1,3,2), 0, mast));
-			mast.currColour = 0xFFFFFF;
-			mast.borderColour = 0x3D3F3D;
+			//mast.currColour = 0xFFFFFF;
+			//mast.borderColour = 0x3D3F3D;
+			mast.currAlpha = 1;
 			mast.isMovable = false;
 			
 			allObjects = new Array(

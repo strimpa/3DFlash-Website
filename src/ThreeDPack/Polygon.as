@@ -1,5 +1,6 @@
 ﻿package ThreeDPack
 {
+	import adobe.utils.ProductManager;
 	import flash.events.MouseEvent;
 	import flash.display.*;
 	import flash.events.TextEvent;
@@ -21,9 +22,12 @@
 		public var depth2:Number=0;
 		public var opacity:Number=100;
 		public var colour:Number;
+		
+		// content related
 		private var titleField:TextField;
 		private var textSprite:Sprite;
 		private var textField:TextField;
+		private var mCurves:Array;
 		
 	// new point calculation
 	//	var points:Array;
@@ -62,6 +66,8 @@
 			otherElementParts = new Array();
 			textSprite = new Sprite();
 			this.addChild(textSprite);
+			mCurves = new Array();
+//			this.blendMode = BlendMode.SCREEN; TOOOOOOOOOOOO Costy
 		}
 		
 		public function calcFaceNormal():void
@@ -235,6 +241,7 @@
 			}
 			removeChild(textSprite);
 			textField = undefined;
+			textSprite.graphics.clear();
 //			trace("poly " + unsortedIndex + " collapsed");
 			super.OnCollapsed();
 		}
@@ -247,7 +254,7 @@
 		public override function OnExtending():void
 		{
 			addChild(textSprite);
-			textSprite.alpha = 0;
+			textSprite.alpha = 1;
 			super.OnExtending();
 		}
 		
@@ -266,10 +273,9 @@
 					textField = new TextField();
 					textField.selectable = false;
 					textField.wordWrap = true;
+					textField.multiline = true;
 					textField.blendMode = BlendMode.LAYER;
-//					textField.defaultTextFormat = globals.textformatsmall;
-//					textField.embedFonts = true;
-					textSprite.addChild(Content.getBG());
+//					textSprite.addChild(Content.getBG());
 					textSprite.addChild(textField);
 					textField.styleSheet = Content.getStyle();
 					textField.htmlText = text;
@@ -278,9 +284,23 @@
 				{
 					trace(error.getStackTrace());
 				}
+				CurvedLineManager.setFilling(false);
+				CurvedLineManager.setRadius(100);
+				CurvedLineManager.createCurve(
+					new Point(50, -50),
+					new Point(-150, -50),
+					new Point(-150, 100),
+					new Point(400, 0), 
+					textSprite);
+				//mCurves.push(CurvedLineManager.createCurve(
+					//new Point(0+500, 0), 
+					//new Point(0+20, 0),
+					//new Point(0, 0+20),
+					//new Point(0, 0+50),
+					//textSprite));
+				CurvedLineManager.setFilling(true);
+				CurvedLineManager.setRadius(50);
 			}
-			else
-				trace("textfiled already there!");
 		}
 		public function setHeader(header:String):void
 		{
@@ -299,6 +319,7 @@
 			if(titleField && contains(titleField))
 				removeChild(titleField);
 			titleField = undefined;
+			textSprite.graphics.clear();
 		}
 
 		public override function calcMovements():void
@@ -327,8 +348,7 @@
 		public function draw(points:Array, normals:Array=undefined):void
 		{
 			graphics.clear(); // clearing for drawing with shading
-			//currFace.blendMode = currFace.myObj.origObj.blendModes[currFace.myObj.originIndex[currFace.myIndex]];
-			graphics.beginFill(currColour, 1/*myObj.polygons[polyIndex].opacity*/);
+			graphics.beginFill(currColour, parentObj.currAlpha);
 //			var colouredBitmap:BitmapData = ThreeDApp.image.bitmapData.clone();//new BitmapData(600,400,true,0xFFFFFFFF);// = ThreeDApp.overlayBitmap;
 //			var matrix:Matrix = new Matrix(); 
 //			matrix.scale(1, 4);
@@ -345,7 +365,7 @@
 //						trace("dep:"+dep);
 //					if(dep)graphics.lineStyle((dep<=0?0.5:(dep+200)/100), 0x0000FF, /*(dep<=0?1:7/dep)*10*/100);
 //					else 
-			graphics.lineStyle(1, parentObj.borderColour, 1);
+			//graphics.lineStyle(1, parentObj.borderColour, parentObj.currAlpha);
 			// move to first Point
 			var indices:Array = moving?pointMoveIndices:pointIndices;
 			var endPoint:ThreeDPoint = points[indices[0]];
@@ -371,7 +391,7 @@
 				}
 				//trace("vertIndex:"+vertIndex+", currPoint:"+currPoint.x+", "+currPoint.y);
 				if(renderTheEdge)// || moving
-					graphics.lineStyle(2, parentObj.borderColour, 1);
+					graphics.lineStyle(2, parentObj.borderColour, parentObj.currAlpha);
 				else
 					graphics.lineStyle(1, parentObj.borderColour, 0);
 				graphics.lineTo(currPoint.x, currPoint.y);

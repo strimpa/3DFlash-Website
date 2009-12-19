@@ -10,12 +10,12 @@ package
 	import ThreeDPack.ThreeDPoint;
 
 	public class KeywordManager extends Sprite{
-		var keywords:Array = ["progamming", "web", "3D", "uni", "design"];
-		var menuMovie:Sprite;
-		var localOrigin:Point;
-		var middle:ThreeDPoint = ThreeDApp.spectrumMiddle;
-		var spriteMiddle:ThreeDPoint = new ThreeDPoint(220, 110, 0);
-		var movements:Array;
+		private var keywords:Array = ["progamming", "web", "3D", "uni", "design"];
+		static private var menuMovie:Sprite;
+		private var localOrigin:Point;
+		private var middle:ThreeDPoint = ThreeDApp.spectrumMiddle;
+		private var spriteMiddle:ThreeDPoint = new ThreeDPoint(220, 110, 0);
+		static private var movements:Array;
 
 		public function KeywordManager(parent:Sprite)
 		{
@@ -62,7 +62,7 @@ package
 						movements[pointNo] = -Math.atan2(-(mousePos.y-middle.y), mousePos.x-middle.x);
 		}
 		
-		public function resetPositions():void
+		static public function resetPositions():void
 		{
 			for(var pointNo:Number=0;pointNo<menuMovie.numChildren;pointNo++)
 				movements[pointNo] = -90*(Math.PI/180);

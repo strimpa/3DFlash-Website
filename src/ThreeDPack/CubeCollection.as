@@ -32,7 +32,7 @@ package ThreeDPack
 				{
 					var position:ThreeDPoint = new ThreeDPoint(-totalWidth*0.5 + size*row * 1.3, -totalWidth*0.5 + size*col * 1.3, 0);
 					//var box = 
-					mCubes[creationIndex] = new Cube(size, position, ContentManager.getContent(creationIndex));
+					mCubes[creationIndex] = new Cube(size, position, creationIndex, ContentManager.getContent(creationIndex));
 					mCubes[creationIndex].name = "higherBox_"+creationIndex;
 					ThreeDCanvas.appendToObjects(mCubes[creationIndex]);
 					creationIndex++;
@@ -43,17 +43,22 @@ package ThreeDPack
 		{
 		}
 		
-		function OnCollide()
-		{
-		}
-		
 		static function setCubesActive(act:Boolean, keyword:String)
 		{
 			for each(var aCube:Cube in mCubes)
 			{
-//				trace("mCategory:"+aCube.myContent.mCategory+", keyword:"+keyword);
 				if(aCube.getContent().mCategory == keyword)
 					aCube.setActive(act);
+			}
+		}
+		static function setCubeActive(act:Boolean, index:uint)
+		{
+			for (var cubeIndex=0; cubeIndex < mCubes.length; cubeIndex++ )
+			{
+				if (cubeIndex == index)
+					mCubes[cubeIndex].setActive(act);
+				else
+					mCubes[cubeIndex].setActive(!act);
 			}
 		}
 

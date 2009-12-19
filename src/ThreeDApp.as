@@ -123,7 +123,7 @@ package
 		
 		public static function resetCurves():void
 		{
-			curvedLines.reset();
+			CurvedLineManager.doReset();
 		}
 		
 		public function CreateBezierOverlay():void
@@ -389,7 +389,7 @@ package
 			keywords.draw();
 			
 			curvedLines.Process();
-			curvedLines.reset();
+//			CurvedLineManager.doReset();
 			curvedLines.draw();
 		} 
 	}

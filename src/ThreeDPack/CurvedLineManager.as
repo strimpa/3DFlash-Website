@@ -6,8 +6,7 @@ package ThreeDPack
 	
 	public class CurvedLineManager extends Sprite
 	{
-		
-		var curveObjects:Array;
+		static var curveObjects:Array;
 		
 		static var numPointsOnSection:Number = 20;
 		static var numSections:Number = 2;
@@ -17,32 +16,41 @@ package ThreeDPack
 		static var drawCurveFlag:Boolean=true;
 		static var shiftFlag:Boolean=true;
 		static var drawCircleFlag:Boolean=true;
-		static var fillingFlag:Boolean=true;
+		static var fillingFlag:Boolean = true;
+		static var mRadius:Number = 50;
 		
 		// new
 		static var mouseSaves:Array;
 		static var currMouseClicks:Number;
-		static var colour:Number; 
+		static var colour:Number;
+		
+		public static var allPointsCurvedOld:Array;
+		public static var firstExecution:Boolean = true;
+
+		static var reset:Boolean = false;
 		
 		public function CurvedLineManager()
 		{
-			curveObjects = new Array(1);
-			curveObjects[0] = new CurvedLine();
+			allPointsCurvedOld = new Array();
+			curveObjects = new Array();
 			mouseSaves = new Array();
 			currMouseClicks = 0;
 			colour = 0x3F3333;
 		}
 		
-		public function reset()
+		public static function doReset()
 		{
-			graphics.clear();
+//			curveObjects[0].graphics.clear();
+			allPointsCurvedOld = new Array();
+			firstExecution = true;
+			reset = true;
 		}
 		
 		/***************************************************************************
 		EVent handlers functions
 		****************************************************************************/
 
-		public function registerPosition(stageX:Number, stageY:Number):void
+		public static function registerPosition(stageX:Number, stageY:Number):void
 		{
 			var error = undefined;
 			error.draw();
@@ -55,7 +63,7 @@ package ThreeDPack
 			{
 				//trace("zeichnen jetzt!"+_root.mouseSaves[1]);
 			
-				this.setSections(2);
+				CurvedLineManager.setSections(2);
 				curveObjects[0].create(mouseSaves[0], mouseSaves[1], mouseSaves[2], mouseSaves[3]);
 				//var linie = new CurvedLine(_root.mouseSaves[0], _root.mouseSaves[1], _root.mouseSaves[2]);
 				//_root.attachMovie('MC','neuMC',_root.getNextHighestDepth(),linie);
@@ -64,25 +72,38 @@ package ThreeDPack
 			}
 		}
 		
-		public function createCurve(begin:Point, control1:Point, control2:Point, end:Point, canvas:Sprite):Boolean
+		public static function createCurve(begin:Point, control1:Point, control2:Point, end:Point, canvas:Sprite):CurvedLine
 		{
-			return curveObjects[0].create(begin, control1, control2, end, canvas);
+			var newLine:CurvedLine = new CurvedLine();
+			curveObjects.push(newLine);
+			if (newLine.myCanvas)
+			{
+				newLine.myCanvas.graphics.clear();
+			}
+			var success:Boolean = newLine.create(begin, control1, control2, end, canvas);
+			if (reset)
+			{
+//				newLine.animIndex = 0;
+				reset = false;
+			}
+			
+			return newLine;
 		}
 		
 		/********************************
 		getters and setters
 		********************************/
 		
-		public function setGuide(flag:Boolean):void{
+		public static function setGuide(flag:Boolean):void{
 			drawGuideFlag=flag;
 		}
-		public function getGuide():Boolean{
+		public static function getGuide():Boolean{
 			return drawGuideFlag;
 		}
-		public function setFilling(flag:Boolean):void{
+		public static function setFilling(flag:Boolean):void{
 			fillingFlag=flag;
 		}
-		public function getFilling():Boolean{
+		public static function getFilling():Boolean{
 			return fillingFlag;
 		}
 		
@@ -98,11 +119,16 @@ package ThreeDPack
 		public function getCircles():Boolean{
 			return drawCircleFlag;
 		}
-		public function setSections(num:Number):void{
+		public static function setSections(num:Number):void {
+			doReset();
 			numSections=num;
 		}
 		public function getSections():Number{
 			return numSections;
+		}
+		public static function setRadius(newRadius:Number)
+		{
+			mRadius = newRadius;
 		}
 		
 		public function Process()
@@ -115,9 +141,11 @@ package ThreeDPack
 		
 		public function draw()
 		{
+			var counter:uint = 0;
 			for each(var obj:Object in curveObjects)
 			{
 				(obj as CurvedLine).draw();
+//				trace("render curve no:"+counter++);
 			}
 		} // draw function
 	} //class CurvedLine

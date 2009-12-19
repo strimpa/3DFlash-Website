@@ -17,6 +17,7 @@
 		private var styleObj:Object = new Object();
 		private var myTitleSprite:Sprite = undefined;
 		private var mouseIsOverMe:Boolean = true;
+		private var collectionIndex:uint = 0;
 		
 		private var moveToCamIter:int = 0;
 		private var moveToCamera:uint = 0;
@@ -28,10 +29,11 @@
 		
 		private var currFacingPoly:uint;
 		
-		public function Cube(size_p:Number, pos:ThreeDPoint, content=undefined)
+		public function Cube(size_p:Number, pos:ThreeDPoint, collectionIndex:uint, content=undefined)
 		{
 			name="cube";
 			this.myContent = content;
+			this.collectionIndex = collectionIndex;
 			myContent.setCube(this);
 			this.size = size_p;
 			this.mPos = pos.clone(); 
@@ -184,14 +186,14 @@
 				invokeTitleShow();
 				
 			var invWVMatrix:ThreeDMatrix = ThreeDCanvas.GetWorldViewMatrix().Inverse();
-			//invWVMatrix.rotate( -180, -currCubeRot, 0);
+			invWVMatrix.rotate( 180, 0, 0);
 			var distance = new ThreeDPoint(event.stageX, event.stageY,0).minus(position);
 			var swizzleDistance = new ThreeDPoint(distance.y, distance.x, 0);
 			var localAxisVec:ThreeDPoint = swizzleDistance.mul(invWVMatrix);//(Math.random(),Math.random(),Math.random());
 			localAxisVec.normalize();
 			this.myMatrixStack[1].MakeAxisRotationMatrix(localAxisVec, 0.5);
-			var transVec = new ThreeDPoint(0,0,5).mul(invWVMatrix);
-			this.myMatrixStack[1].translateByVec(transVec);
+			//var transVec = new ThreeDPoint(0,0,20).mul(invWVMatrix);
+			//this.myMatrixStack[1].translateByVec(transVec);
 			super.mouseOverHandler(event);
 
 			ThreeDApp.SetMouseOverCube(myContent.mTitle);
@@ -280,7 +282,7 @@
 				currCubeRot = currCubeRot + (targetRot - currCubeRot)/2;
 			}
 			myMatrixStack[2] = new ThreeDMatrix();
-			myMatrixStack[2].rotate(180, currCubeRot, 0);
+			myMatrixStack[2].rotate(180, currCubeRot, 0);	
 			myMatrixStack[2].translateByVec(currMovePos);
 
 			if(mouseRotMode)
@@ -313,7 +315,10 @@
 		public override function OnExtending():void
 		{
 			ThreeDCanvas.rotFlag = false;
+			CubeCollection.setCubeActive(true, collectionIndex);
 //			setMask(undefined);
+			CurvedLineManager.doReset();
+			CurvedLineManager.setGuide(true);
 		}
 
 		public override function OnExtended():void
@@ -328,6 +333,9 @@
 		public override function OnCollapsing():void
 		{
 			ThreeDCanvas.rotFlag = true;
+			CurvedLineManager.setSections(2);
+			CurvedLineManager.setGuide(false);
+			CurvedLineManager.doReset();
 			resetPolyHeaders();
 			if (ExternalInterface.available)
 			{
@@ -338,6 +346,11 @@
 				//}
 			}
 			super.OnCollapsing();
+		}
+		public override function OnCollapsed():void
+		{
+			CubeCollection.setCubesActive(true, myContent.mCategory);
+			super.OnCollapsed();
 		}
 
 		public function showContent():void
@@ -370,25 +383,7 @@
 				return;
 			titleInvoked = true;
 			var title:String = myContent.mTitle;
-			var one:ThreeDPoint,two:ThreeDPoint;
-			one = this.position;
-			two = this.position.plus(new ThreeDPoint(100+Math.random()*100,100+Math.random()*100));
-			var one2d:Point = new Point(one.x,one.y);
-			var two2d:Point =  new Point(two.x,two.y);
-			var dist = two2d.subtract(one2d);
-
-			myTitleSprite = TitleFieldManager.showTitleAtPoint(title, two2d);
-			if(!ThreeDApp.curvedLines.createCurve(
-				//begin_p, control1_p, control2_p, end_p
-					one2d,
-					one2d.add(new Point(Math.random()*dist.x,Math.random()*dist.y)),
-					one2d.add(new Point(Math.random()*dist.x,Math.random()*dist.y)),
-					two2d,
-					myTitleSprite
-				))
-			{
-				trace("Couldn't draw curve!!");
-			}
+			myTitleSprite = TitleFieldManager.showTitleAtPoint(title, this);
 		}
 	}
 }
