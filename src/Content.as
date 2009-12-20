@@ -4,6 +4,7 @@ package {
 	import flash.text.TextField;
 	import ThreeDPack.Cube;
 	import flash.text.StyleSheet;
+	import ContentManager;
 
 	/**
 	 * @author Gunnar
@@ -15,7 +16,6 @@ package {
 		public var mCategory:String;
 		public var mKeywords:Array;
 		public var mContentUrl:String;
-		private var mLoader:TargetLoadVars;
 		private var mMyCube:Cube;
 		private var mTexts:Array;
 		private var mHeaders:Array;
@@ -23,7 +23,6 @@ package {
 		private static var contentBG:Sprite;
         public function Content()
 		{
-			mLoader = new TargetLoadVars(this);
 			mTexts = new Array();
 			mHeaders = new Array();
 			styleString = new StyleSheet();
@@ -36,7 +35,7 @@ package {
 		
 		public function load():void
 		{
-			mLoader.loadItem(mContentUrl);
+			ThreeDApp.getContent().LoadObject(mContentUrl, ContentManager.xml, undefined, this.onData);
 		}
 		
 		public static function contentStyleLoaded(data:Object):void

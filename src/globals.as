@@ -7,6 +7,7 @@ package
 
 	public class globals {
 		public static var textformatSmall:TextFormat;
+		public static var textformatSmallBright:TextFormat;
 		public static var textformatMenuTitle:TextFormat;
 		public static var textformatCubeTitle:TextFormat;
 		
@@ -21,6 +22,11 @@ package
 	        textformatSmall.color = 0x3D3F3D;
 	        textformatSmall.size = 8;
 	        textformatSmall.underline = false;
+			
+			textformatSmallBright = new TextFormat();
+	        textformatSmallBright.font = "Verdana";
+	        textformatSmallBright.size = 8;
+			textformatSmallBright.color = 0xAAAAAA;
 		}
 		
 		public static function InitStreamFont()

@@ -108,7 +108,7 @@
 					{
 						currSmoothingGroup = lines[lineIndex].substring((lines[lineIndex].indexOf(" ")+1), 
 												  						lines[lineIndex].length);
-						trace("currSmoothingGroup:"+currSmoothingGroup);
+//						trace("currSmoothingGroup:"+currSmoothingGroup);
 						newObject.isMovable = (currSmoothingGroup!=1);
 					}
 					else if(lines[lineIndex].indexOf("vn")==0)

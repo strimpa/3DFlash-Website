@@ -12,41 +12,51 @@ package
 	public class ContentManager {
 		
 		static var contentXML:XML = new XML();
-		const xml:uint = 0, swf:uint = 1, sceneData:uint = 2, css:uint = 3;
-		const target:uint = 0, type:uint = 1, storage:uint = 2, callback:uint = 3;
-		var loadVars:TargetLoadVars;
-		var loadSwf:TargetLoad;
-		var queue:Array = [
-			LoadObject("bg.jpg", swf, undefined, ThreeDApp.addToBackground),
-			LoadObject("baloo.swf", swf, undefined, ThreeDApp.addToBackground),
-			LoadObject("FontLoad.swf", swf, undefined, fontInit),
-			LoadObject("content.xml", xml, contentXML, ThreeDApp.InitCanvas),
-			LoadObject("skull.obj", sceneData, undefined, ThreeDPack.Obj2As.onData),
-			LoadObject("html/contentStyle_as.css", css, undefined, Content.contentStyleLoaded),
-			LoadObject("barock.swf", swf, undefined, Content.contentBGLoaded),
-			LoadObject("exit.swf", swf, undefined, ThreeDCanvas.exitSpriteLoaded),
-			LoadObject("keywords.swf", swf, undefined, ThreeDApp.keywords.onData)
-			];
+		const LOADING:uint = 0, IDLE:uint = 1;
+		public static const xml:uint = 0, swf:uint = 1, sceneData:uint = 2, css:uint = 3;
+		public static const target:uint = 0, type:uint = 1, storage:uint = 2, callback:uint = 3;
+		var state:uint = IDLE;
+		static var loadVars:TargetLoadVars;
+		static var loadSwf:TargetLoad;
+		var queue:Array;
 //		var queue:Array;
-		var loadingIndex:int = -1;
+//		var loadingIndex:int = -1;
 		static var fonts:Array;
 		
 		function ContentManager()
 		{
-//			queue = new Array();
+			queue = new Array();
 			loadVars = new TargetLoadVars(this);
 			loadSwf = new TargetLoad(this);
-			loadNextItem();
+			LoadObject("bg.jpg", swf, undefined, ThreeDApp.addToBackground);
+			LoadObject("baloo.swf", swf, undefined, ThreeDApp.addToBackground);
+			LoadObject("FontLoad.swf", swf, undefined, fontInit);
+			LoadObject("content.xml", xml, contentXML, ThreeDApp.InitCanvas);
+			LoadObject("skull.obj", sceneData, undefined, ThreeDPack.Obj2As.onData);
+			LoadObject("html/contentStyle_as.css", css, undefined, Content.contentStyleLoaded);
+			LoadObject("barock.swf", swf, undefined, Content.contentBGLoaded);
+			LoadObject("exit.swf", swf, undefined, ThreeDCanvas.exitSpriteLoaded);
+			LoadObject("keywords.swf", swf, undefined, ThreeDApp.keywords.onData);
 		}
 		
-		private function LoadObject(target_p:String, type_p:uint, storage_p:Object, callback_p:Function):Array
+		public static function getLoader():TargetLoad
+		{
+			return loadSwf;
+		}
+		
+		public static function getTextLoader():TargetLoadVars
+		{
+			return loadVars;
+		}
+		
+		public function LoadObject(target_p:String, type_p:uint, storage_p:Object, callback_p:Function):void
 		{
 			var back:Array = new Array(4);
 			back[target] = target_p;
 			back[type] = type_p;
 			back[storage] = storage_p;
 			back[callback] = callback_p;
-			return back;
+			queue.push(back);
 		}
 		
 		public function onData(data:Object):void
@@ -54,7 +64,7 @@ package
 			trace("onData");
 			if (data != undefined) 
 			{
-				var item:Object = queue[loadingIndex];
+				var item:Object = queue[0];
 				if(item[storage]!=undefined)
 				{
 					trace("item.storage!=undefined");
@@ -75,11 +85,11 @@ package
 			    }
 			    else
 			    	trace("item.callback=undefined");
-			    	
-			    loadNextItem();
 			} else {
 				trace("error! Unable to load external file. ");
 			}
+			queue.splice(0, 1);
+			state = IDLE;
 			//trace("that");
 		}
 
@@ -113,9 +123,8 @@ package
 		
 		private function loadNextItem():void
 		{
-			loadingIndex++;
 			trace("loadNextItem");
-			var item:Object = queue[loadingIndex];
+			var item:Object = queue[0];
 			if(item == undefined)
 				return;
 			trace(item);
@@ -123,10 +132,14 @@ package
 				loadVars.loadItem(item[target]);
 			else
 				loadSwf.loadItem(item[target]);
+			
+			state = LOADING;
 		}
 		
 		public function Process()
 		{
+			if (queue.length > 0 && state==IDLE)
+				loadNextItem();
 		}
 	}
 }

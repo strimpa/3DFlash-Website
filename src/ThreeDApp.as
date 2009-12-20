@@ -37,11 +37,12 @@ package
 		public static var circleRadius:uint = 200;
 		public var styleString:String = "	color:#3D3F3D;";
 
-		public var content:ContentManager;
+		public static var content:ContentManager;
 		static var txtFieldMgr:TitleFieldManager;
 		
 		public static var keywords:KeywordManager;
 		public static var curvedLines:CurvedLineManager;
+		public static var loader:LoaderDisplay;
 
 		// controls
 		public var slider:MySlider;
@@ -77,6 +78,8 @@ package
 			addChild(elements);
 			overlaySprite = new Sprite();
 			addChild(overlaySprite);
+			loader = new LoaderDisplay(this);
+			addChild(loader);
 
 			CreateBG();
 			output("create mask");
@@ -366,6 +369,11 @@ package
 			}
 		}
 		
+		public static function getContent():ContentManager
+		{
+			return content;
+		}
+		
 		private function draw(event:Event):void
 		{
 			debugText.text = "fps:"+lastFrameCount;//slider.getValue();
@@ -391,6 +399,10 @@ package
 			curvedLines.Process();
 //			CurvedLineManager.doReset();
 			curvedLines.draw();
+			content.Process();
+			
+			loader.Process();
+			loader.draw();
 		} 
 	}
 }

@@ -14,13 +14,17 @@ package
 		var callObj:Object;
 		var httpStatusType:String;
 		var objectName:String;
+		var childLoaders:Array;
+		var childNames:Array
 		
 		public function TargetLoad(callObj_p:Object):void
 		{
 			super();
-			objectName
 			this.callObj=callObj_p;
-			configureListeners(this);
+			childLoaders = new Array();
+			childNames = new Array();
+			configureListeners(this.contentLoaderInfo, "TargetLoad");
+			this.name = "TargetLoad";
 		}
 		
 		public function loadItem(item:String)
@@ -29,6 +33,9 @@ package
 			try
 			{
 				load(new URLRequest(item));
+				trace("loadItem()");
+				trace("childLoaders.length:"+childLoaders.length);
+				registerQueueTuple(contentLoaderInfo, item);
 			}
 			catch(e:Error)
 			{
@@ -37,29 +44,68 @@ package
 			}
 		}
 
-        private function configureListeners(dispatcher:Loader):void {
-            dispatcher.contentLoaderInfo.addEventListener(Event.COMPLETE, completeHandler);
-            dispatcher.contentLoaderInfo.addEventListener(Event.OPEN, openHandler);
-            dispatcher.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, progressHandler);
-            dispatcher.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
-            dispatcher.contentLoaderInfo.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
-            dispatcher.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
-        }
+        public function configureListeners(dispatcher:LoaderInfo, loaderString:String, isChildQueue:Boolean = false):void {
+			if (isChildQueue)
+			{
+				dispatcher.addEventListener(Event.COMPLETE, completeChildHandler);
+				registerQueueTuple(dispatcher, loaderString);
+			}
+			else
+				dispatcher.addEventListener(Event.COMPLETE, completeHandler);
+				
+            dispatcher.addEventListener(Event.OPEN, openHandler);
+            dispatcher.addEventListener(ProgressEvent.PROGRESS, progressHandler);
+            dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
+            dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
+            dispatcher.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
+			trace("childLoaders.length:"+childLoaders.length);
+       }
+	   
+	    public function registerQueueTuple(eventTarget:LoaderInfo, name:String)
+		{
+			childLoaders.push(eventTarget);
+			childNames.push(name);
+			ThreeDApp.loader.registerLoadingItem(name);
+		}
+	    public function unRegisterQueueTuple(eventTarget:LoaderInfo)
+		{
+			var index:uint = childLoaders.indexOf(eventTarget);
+			ThreeDApp.loader.unRegisterLoadingItem(childNames[index]);
+			childLoaders.splice(index, 1);
+			childNames.splice(index, 1);
+		}
 
         private function completeHandler(event:Event):void {
             var content:Object = event.target.content;
             trace("completeHandler: " + content + objectName);
 			unload();
+			unRegisterQueueTuple(event.target as LoaderInfo);
 			callObj.onData(content);
 			objectName = "";
         }
 
+		private function completeChildHandler(event:Event):void
+		{
+			var index:uint = childLoaders.indexOf(event.currentTarget);
+			unRegisterQueueTuple(event.target as LoaderInfo);
+			trace("childLoaders.length:"+childLoaders.length);
+			if (childLoaders.length == 0)
+			{
+				ContentManager.getTextLoader().childLoadComplete();
+			}
+		}
+
         private function openHandler(event:Event):void {
-            trace("openHandler: " + event + " for object " + objectName);
+ 			var index:uint = childLoaders.indexOf(event.currentTarget);
+			trace(childNames);
+			trace(childLoaders);
+           trace("openHandler: " + event + " for object " + childNames[index]);
         }
 
         private function progressHandler(event:ProgressEvent):void {
-            trace("progressHandler loaded:" + event.bytesLoaded + " total: " + event.bytesTotal + " of " + objectName);
+			var index:uint = childLoaders.indexOf(event.currentTarget);
+			ThreeDApp.loader.updateProgress(childNames[index], event.bytesLoaded/event.bytesTotal);
+            trace("progressHandler loaded:" + event.bytesLoaded + " total: " + event.bytesTotal + " of " +index+ ", " + childNames[index]);
         }
 
         private function securityErrorHandler(event:SecurityErrorEvent):void {
