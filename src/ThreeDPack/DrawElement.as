@@ -119,6 +119,7 @@ package ThreeDPack
 //					trace("movementIndex:"+movementIndex+", pendingMovements.length:"+pendingMovements.length);
 					setState(EXTENDED);
 					OnExtended();
+//					this.moving=false;
 				}
 				else
 				{
@@ -131,6 +132,7 @@ package ThreeDPack
 			}
 			else if(COLLAPSING==getState())
 			{
+				this.moving=true;
 				if(this.movementIndex<=0)
 				{
 					setState(COLLAPSED);

@@ -114,11 +114,13 @@
 			this.pics[index]=file_p;
 		}
 		
+		function isDirty():Boolean
+		{
+			return (currAlpha < 1) || moving;
+		}
+		
 		function worldTransform(matrixStack:Array, origObjNum:Number):ThreeDObject
 		{ 
-//			if(this.mCurrState == EXTENDED)
-//				return this;
-			
 			//var back:ThreeDObject = this.copy(origObjNum);
 			matrixStack = myMatrixStack.concat(matrixStack);
 			this.origObjInd = origObjNum;
@@ -381,6 +383,9 @@
 				
 			currAlpha = isActive()? currAlpha+0.1 : currAlpha-0.1;
 			currAlpha = currAlpha<0?0:(currAlpha>1)?1:currAlpha;
+			
+			if (isDirty())
+				ThreeDCanvas.SetDirty();
 		}
 		
 		public override function moveStep():void

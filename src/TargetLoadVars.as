@@ -13,7 +13,6 @@
 		var httpStatusType:String;
 		var objectName:String;
 		var checkTextField:TextField;
-		var pictureIds:Array = ["pic1", "pic2", "pic3", "pic4", "pic5", "pic6", "pic7", "pic8", "pic9"];
 		var tempString:String;
 		
 		public function TargetLoadVars(callObj_p:Object):void
@@ -47,39 +46,7 @@
 			trace("check for other loaders inside data.");
 			checkTextField.htmlText = theString;
 			objectName = "";
-			var picLoader:TargetLoad = ContentManager.getLoader();
-			var picsFound:Boolean = false;
-			for each(var picId in pictureIds)
-			{
-				var ref:DisplayObject = checkTextField.getImageReference(picId);
-				if(ref)
-					trace("got pic: " + picId);
-				if (ref && (ref is Loader))
-				{
-					picsFound = true;
-					var theLoader:Loader = (ref as Loader);
-					theLoader.name = picId;
-					picLoader.configureListeners(theLoader.contentLoaderInfo, picId, true);
-				}
-			}
-			
-			if (picsFound)
-			{
-				trace("childLoaders.length:" + picLoader.childLoaders.length);
-				tempString = new String(theString);
-			}
-			else
-			{
-				trace("no child loaders");
-				callObj.onData(theString);
-			}
-        }
-
-		public function childLoadComplete()
-		{
-			trace("childLoadComplete() ");
-			callObj.onData(tempString);
-			checkTextField.htmlText = "";
+			callObj.onData(theString);
 		}
 
         private function openHandler(event:Event):void {

@@ -49,7 +49,9 @@
 		var inner:Boolean = false;
 		var knockout:Boolean = false;		
 		var filter:GlowFilter;
-		
+
+		public static var dirty:Boolean = true;
+
 		public function ThreeDCanvas()
 		{
 //			width = 400;
@@ -281,7 +283,7 @@
 		public function Process(event:Event):void
 		{
 			worldMatrix.rotate( 0,dragRot-=currRot,0 );
-			currRot/=2;
+			currRot /= 2;
 			for(var objIndex:Number=0; objIndex<allObjects.length; objIndex++)
 			{
 				if(!allObjects[objIndex].isActive())
@@ -301,8 +303,19 @@
 			}
 		}
 		
+		public function isDirty():Boolean
+		{
+			return (Math.abs(currRot) > 0.001) || dirty;
+		}
+		public static function SetDirty():void
+		{
+			dirty = true;
+		}
+		
 		public function draw(event:Event):void
 		{
+			if(!isDirty())
+				return;
 			//if(reloadDrawList)
 			for(var delIndex:Number=0;delIndex<drawListSprite.numChildren;delIndex++)
 				drawListSprite.removeChildAt(delIndex);
@@ -329,12 +342,7 @@
 			{
 				if(!allObjects[objIndex].isActive())
 					continue;
-				//var newObject:ThreeDObject=
 				allObjects[objIndex].worldTransform(matrixStack, objIndex);
-//				var sortIndex:Number=0;
-//				while(sortIndex<sortIndices.length && allObjects[sortIndices[sortIndex]].depth>newObject.depth)
-//					sortIndex++;
-//				sortIndices.splice(sortIndex,0,objIndex);
 				allObjects[objIndex].draw();
 			}//for
 			sortDrawList();
@@ -397,17 +405,7 @@
 				}
 			} // for object
 			
-//			drawListSprite.addChild(glowSprite);
-			
-//			for(var allObjIndex:Number=0; allObjIndex<sortIndices.length; allObjIndex++)
-//			{
-//				var objIndex:Number = sortIndices[allObjIndex];
-//				if(allObjIndex+1<numChildren)
-//					removeChildAt(allObjIndex);
-//				addChildAt(allObjects[objIndex], allObjIndex);
-//				allObjects[objIndex].draw();
-//			} // for object
-
+			dirty = false;
 			//trace(System.totalMemory);
 		} // draw()
 		

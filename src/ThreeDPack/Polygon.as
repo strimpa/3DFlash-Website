@@ -224,6 +224,7 @@
 			if(moving)
 			{
 				parent.SetMovingPolyIndex(this.unsortedIndex);
+				ThreeDCanvas.SetDirty();
 			}
 			currColour = parentObj.currColour;
 		}
@@ -279,6 +280,23 @@
 					textSprite.addChild(textField);
 					textField.styleSheet = Content.getStyle();
 					textField.htmlText = text;
+					var picLoader:TargetLoad = ContentManager.getLoader();
+					var picsFound:Boolean = false;
+					var pictureIds:Array = ["pic1", "pic2", "pic3", "pic4", "pic5", "pic6", "pic7", "pic8", "pic9"];
+					for each(var picId in pictureIds)
+					{
+						var ref:DisplayObject = textField.getImageReference(picId);
+						if(ref)
+							trace("got pic: " + picId);
+						if (ref && (ref is Loader))
+						{
+							picsFound = true;
+							var theLoader:Loader = (ref as Loader);
+							theLoader.name = picId;
+							picLoader.configureListeners(theLoader.contentLoaderInfo, picId, true);
+						}
+					}
+
 				}
 				catch (error:Error)
 				{

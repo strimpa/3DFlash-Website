@@ -89,10 +89,6 @@ package
 			var index:uint = childLoaders.indexOf(event.currentTarget);
 			unRegisterQueueTuple(event.target as LoaderInfo);
 			trace("childLoaders.length:"+childLoaders.length);
-			if (childLoaders.length == 0)
-			{
-				ContentManager.getTextLoader().childLoadComplete();
-			}
 		}
 
         private function openHandler(event:Event):void {

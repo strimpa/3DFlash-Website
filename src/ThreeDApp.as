@@ -61,6 +61,8 @@ package
 		public static var mouseLastCubeOver:String = "";
 		public static var mouseIsOverObject:Boolean = false;
 		
+		public static var enableDraw:Boolean = true;
+		
 		public function ThreeDApp()
 		{
 			//this.opaqueBackground = 0x000000;
@@ -317,7 +319,7 @@ package
 			debugText = new TextField();
 			addChild(debugText);
 			debugText.x = 100;
-			debugText.y = -15;
+			debugText.y = 15;
 		
 			var buttonShape:Sprite = new Sprite();
 			buttonShape.graphics.beginFill(0x888888);
@@ -326,7 +328,7 @@ package
 			rotButton = new SimpleButton(buttonShape,buttonShape,buttonShape,buttonShape);
 			addChild(rotButton);
 			rotButton.x = 10;
-			rotButton.y = -20;
+			rotButton.y = 20;
 
 //			var loadButtonShape:Sprite = new Sprite();
 //			loadButtonShape.graphics.beginFill(0x888888);
@@ -348,7 +350,8 @@ package
 		
 		public function rotButtonClick(event:MouseEvent):void
 		{
-			canvas.toggleGlow();
+//			canvas.toggleGlow();
+			enableDraw = enableDraw?false:true;
 		}
 		
 		private function loadButtonClick(event:MouseEvent):void
