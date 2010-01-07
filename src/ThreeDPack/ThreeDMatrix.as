@@ -53,7 +53,7 @@
 			return isProjState;
 		}
 
-		public function Identity()
+		public function Identity():void
 		{
 			// Identity Matrix
 			this.a = 1;
@@ -74,6 +74,26 @@
 			this.m = 1;
 		}
 		
+		public function IsIdentity():Boolean
+		{
+			// Identity Matrix
+			return this.a == 1 &&
+			this.b == 0 &&
+			this.c == 0 &&
+			this.d == 0 &&
+			this.e == 1 &&
+			this.f == 0 &&
+			this.g == 0 &&
+			this.h == 0 &&
+			this.i == 1 &&
+			this.j == 0 &&
+			this.k == 0 &&
+			this.l == 0 &&
+			this.tx == 0 &&
+			this.ty == 0 &&
+			this.tz == 0 &&
+			this.m == 1;
+		}
 		
 		public function ScaleValues(by:Number, ignorePos:Boolean=false)
 		{
@@ -97,6 +117,26 @@
 				this.tz *= by;
 			}
 			this.m = 1+(this.m-1)*by;
+
+			if(0.01>Math.abs(this.a-1)) this.a = 1;
+			if(0.01>Math.abs(this.b)) this.b = 0;
+			if(0.01>Math.abs(this.c)) this.c = 0;
+			if(0.01>Math.abs(this.d)) this.d = 0;
+			if(0.01>Math.abs(this.e-1)) this.e = 1;
+			if(0.01>Math.abs(this.f)) this.f = 0;
+			if(0.01>Math.abs(this.g)) this.g = 0;
+			if(0.01>Math.abs(this.h)) this.h = 0;
+			if(0.01>Math.abs(this.i-1)) this.i = 1;
+			if(0.01>Math.abs(this.j)) this.j = 0;
+			if(0.01>Math.abs(this.k)) this.k = 0;
+			if(0.01>Math.abs(this.l)) this.l = 0;
+			if(!ignorePos)
+			{
+				if(0.01>Math.abs(this.tx)) this.tx = 0;
+				if(0.01>Math.abs(this.ty)) this.ty = 0;
+				if(0.01>Math.abs(this.tz)) this.tz = 0;
+			}
+			if(0.01>Math.abs(this.m-1))this.m = 1;
 		}
 		
 		static function tweenValues(from:ThreeDMatrix, to:ThreeDMatrix, by:Number):ThreeDMatrix

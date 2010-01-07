@@ -33,7 +33,7 @@ package
 			try
 			{
 				load(new URLRequest(item));
-				trace("loadItem()");
+				trace("loadItem():"+objectName);
 				trace("childLoaders.length:"+childLoaders.length);
 				registerQueueTuple(contentLoaderInfo, item);
 			}
@@ -51,7 +51,9 @@ package
 				registerQueueTuple(dispatcher, loaderString);
 			}
 			else
+			{
 				dispatcher.addEventListener(Event.COMPLETE, completeHandler);
+			}
 				
             dispatcher.addEventListener(Event.OPEN, openHandler);
             dispatcher.addEventListener(ProgressEvent.PROGRESS, progressHandler);

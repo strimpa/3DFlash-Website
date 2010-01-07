@@ -16,7 +16,8 @@
 		private var edgeRenderFlags:Array;
 //		public var moveVecs:Array;
 		public var depth:Number;
-		public var origObjInd:Number;
+		public var origObjInd:uint;
+		private static var currActiveObject:int = -1;
 		public var edgeSmoothing:Array;
 		public var currAlpha:Number;
 		
@@ -33,11 +34,11 @@
 		public var lastForceVector:ThreeDPoint = undefined;
 		public var forceDecay:Number = 0;
 		
+		public var dirty:Boolean = true;
+
 		public var paintIndex:Array;			// temoral index in array newObjects
 		public var pics:Array;
 
-		private var active:Boolean = false; 
-		
 		public function ThreeDObject()
 		{
 			name="3dobject";
@@ -57,17 +58,12 @@
 			currAlpha = 0;
 		}
 
-		function setActive(act:Boolean=true)
+		public override function setActive(act:Boolean=true)
 		{
-			this.active = act;
-			if (act == false)
-				currAlpha = 0;
+			super.setActive(act);
+			for each(var p:Polygon in polygons)
+				p.setActive(act);
 //			trace("act? "+act);
-		}
-		
-		function isActive()
-		{
-			return this.active;
 		}
 		
 		public function setPolyColour(mouseOver:Boolean):void
@@ -114,11 +110,6 @@
 			this.pics[index]=file_p;
 		}
 		
-		function isDirty():Boolean
-		{
-			return (currAlpha < 1) || moving;
-		}
-		
 		function worldTransform(matrixStack:Array, origObjNum:Number):ThreeDObject
 		{ 
 			//var back:ThreeDObject = this.copy(origObjNum);
@@ -136,6 +127,7 @@
 		{
 			KeywordManager.resetPositions();
 			super.OnCollapsed();
+			currActiveObject = -1;
 		}
 		
 		protected function objToProj(matrixStack:Array):void
@@ -191,7 +183,7 @@
 				//trace("currMovingPolyPoints");
 				//for each(var point in currMovingPolyPoints)
 					//trace(point);
-				//movingPointsCalculated = true;
+				movingPointsCalculated = true;
 			}
 //			sort();
 			calcDepth();
@@ -325,7 +317,7 @@
 			if(!isMovable)
 				return;
 			ThreeDApp.SetOverObject();
-			if(!moving)
+			if(getState()==COLLAPSED)
 			{
 				currColour = mouseOverColour;
 			}
@@ -336,7 +328,7 @@
 		{
 			if(!isMovable)
 				return;
-			if(!moving)
+			if(getState()==COLLAPSED)
 			{
 				currColour = inactiveColour;
 			}
@@ -345,11 +337,30 @@
 		
 		public override function mouseClickHandler(event:MouseEvent):void
 		{
-			jump();
+			if(!isMovable)
+				return;
+			trace(currActiveObject);
+			if (currActiveObject==origObjInd || -1==currActiveObject)
+			{
+				jump();
+				currActiveObject = origObjInd;
+			}
 		}
 
 		public override function MouseDragHandler(event:MouseEvent):void
 		{
+		}
+		
+		public function isDirty():Boolean
+		{
+			if (!active)
+				return false;
+			return (currAlpha<1 && currAlpha>0) || moving || glowPercentage > 0 || dirty;
+		}
+		
+		public function setDirty():void
+		{
+			dirty = true;
 		}
 		
 		public override function Process(parent:ThreeDObject=undefined):void
@@ -367,7 +378,7 @@
 			if(!isMovable)
 				return;
 			
-			if (getState() != EXTENDED)
+			if (getState() == COLLAPSED)
 			{
 				if(currColour==mouseOverColour)
 					glowFactor = 1;
@@ -385,7 +396,13 @@
 			currAlpha = currAlpha<0?0:(currAlpha>1)?1:currAlpha;
 			
 			if (isDirty())
-				ThreeDCanvas.SetDirty();
+				ThreeDCanvas.setDirty();
+			dirty = false;
+		}
+		
+		public function ignoreDraw():Boolean
+		{
+			return (currAlpha == 0) && (!isActive());
 		}
 		
 		public override function moveStep():void
@@ -503,11 +520,13 @@
 //			var startIndex:Number = 0;
 			//trace(this.name+"numChildren:"+this.numChildren);
 			
-			var isMoving:Boolean = moving;
-//					undefined != this.currMovingPolyIndeces 
-//					&& this.movingPointsCalculated
-//					&& currMovingPolyPoints!=undefined
-//					&& currMovingPolyPoints.length>0;
+			var polysMoving:Boolean = polygons.length>0
+					&& polygons[0].getState() != COLLAPSED 
+					&& undefined != this.currMovingPolyIndeces
+					&& this.movingPointsCalculated
+					&& currMovingPolyPoints!=undefined
+					&& currMovingPolyPoints.length > 0
+					;
 					
 			for(var polyIndex:Number=0; polyIndex<polygons.length; polyIndex++)
 			{
@@ -533,13 +552,13 @@
 				ThreeDCanvas.appendToDrawList(currFace);
 // end drawList approach
 
-				if(isMoving && this.currMovingPolyIndeces!=undefined)// && (this.currMovingPolyIndeces.indexOf(currFace.unsortedIndex) != -1))
+				if(polysMoving)
 				{
-					currFace.draw(currMovingPolyPoints, renderNormals);
+					currFace.draw(currMovingPolyPoints, renderNormals, true);
 				}
 				else
 				{
-					currFace.draw(renderPoints, renderNormals);
+					currFace.draw(renderPoints, renderNormals, false);
 				}
 				
 //				if(polyIndex+1<numChildren)

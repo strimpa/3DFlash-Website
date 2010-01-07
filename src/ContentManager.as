@@ -90,6 +90,7 @@ package
 			}
 			queue.splice(0, 1);
 			state = IDLE;
+			Process();
 			//trace("that");
 		}
 

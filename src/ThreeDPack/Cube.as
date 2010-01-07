@@ -171,7 +171,7 @@
 
 			ThreeDApp.output("Content clicked:"+myContent.mTitle);
 			TitleFieldManager.fadeOutTitle(myTitleSprite);
-			super.mouseClickHandler(event);
+			jump();
 			super.mouseUpHandler(event);
 		}
 		
@@ -274,6 +274,13 @@
 			}
 			this.myMatrixStack[1].ScaleValues(0.8);
 			
+			if (active && !this.myMatrixStack[1].IsIdentity())
+			{
+				//trace(this.collectionIndex);
+				//this.myMatrixStack[1].traceMe();
+				ThreeDCanvas.setDirty();
+			}
+			
 			if (getState()==EXTENDED && !mouseRotMode)
 			{
 				var globalRot:Number = currCubeRot + ThreeDCanvas.dragRot;
@@ -289,6 +296,13 @@
 			{
 				evaluatefacingFace();
 			}
+		}
+		
+		public override function isDirty():Boolean
+		{
+			if (mouseRotMode)
+				return true;
+			return super.isDirty();
 		}
 		
 		public function evaluatefacingFace()

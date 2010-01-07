@@ -20,6 +20,7 @@ package ThreeDPack
 		public var isMovable:Boolean = true;
 		private var callback:Function = null;
 		private var callbackEvent:uint = NONE;
+		protected var active:Boolean = false; 
 
 		public var currColour:Number;
 		public var mouseOverColour:Number = 0x4f3333;
@@ -48,7 +49,27 @@ package ThreeDPack
 			this.pendingMovements = new Array();
 			setState(COLLAPSED);
 		}
+		
+		public function getParentObj():ThreeDObject
+		{
+			return parentObj;
+		}
 
+		public function setActive(act:Boolean=true)
+		{
+			this.active = act;
+			if (!act)
+			{
+				if (parent)
+					parent.removeChild(this);
+			}
+		}
+		
+		public function isActive()
+		{
+			return this.active;
+		}
+		
 		public function mouseOverHandler(event:MouseEvent):void
 		{
 			//trace("mouse over");
@@ -119,7 +140,7 @@ package ThreeDPack
 //					trace("movementIndex:"+movementIndex+", pendingMovements.length:"+pendingMovements.length);
 					setState(EXTENDED);
 					OnExtended();
-//					this.moving=false;
+					this.moving=false;
 				}
 				else
 				{

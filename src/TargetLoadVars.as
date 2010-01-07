@@ -28,6 +28,7 @@
 		{
 			objectName = item;
 			load(new URLRequest("http://www.gunnardroege.de/"+item));//"http://www.gunnardroege.de/3DEngine/bin/"+item)); //http://localhost/website/3DEngine/bin
+		    ThreeDApp.loader.registerLoadingItem(objectName);
 		}
 
         private function configureListeners(dispatcher:IEventDispatcher):void {
@@ -40,6 +41,7 @@
         }
 
         private function completeHandler(event:Event):void {
+			ThreeDApp.loader.unRegisterLoadingItem(objectName);
             var loader:URLLoader = URLLoader(event.target);
             trace("completeHandler: " + " for object " + objectName);// + loader.data);
 			var theString:String = loader.data as String;
@@ -54,6 +56,7 @@
         }
 
         private function progressHandler(event:ProgressEvent):void {
+			ThreeDApp.loader.updateProgress(objectName, event.bytesLoaded/event.bytesTotal);
             trace("progressHandler loaded:" + event.bytesLoaded + " total: " + event.bytesTotal + " for object " + objectName);
         }
 

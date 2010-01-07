@@ -286,7 +286,7 @@
 			currRot /= 2;
 			for(var objIndex:Number=0; objIndex<allObjects.length; objIndex++)
 			{
-				if(!allObjects[objIndex].isActive())
+				if(allObjects[objIndex].ignoreDraw())
 					continue;
 				// object intern transformations
 				allObjects[objIndex].Process();
@@ -307,49 +307,44 @@
 		{
 			return (Math.abs(currRot) > 0.001) || dirty;
 		}
-		public static function SetDirty():void
+		public static function setDirty():void
 		{
 			dirty = true;
 		}
 		
 		public function draw(event:Event):void
 		{
-			if(!isDirty())
-				return;
-			//if(reloadDrawList)
-			for(var delIndex:Number=0;delIndex<drawListSprite.numChildren;delIndex++)
-				drawListSprite.removeChildAt(delIndex);
-			for(delIndex=0;delIndex<glowSprite.numChildren;delIndex++)
-				glowSprite.removeChildAt(delIndex);
-			for(delIndex=0;delIndex<selectedSprite.numChildren;delIndex++)
-				selectedSprite.removeChildAt(delIndex);
+			for (var c:uint = 0; c < drawListSprite.numChildren ; c++)
+				if ((drawListSprite.getChildAt(c) as Polygon).getParentObj().ignoreDraw())
+					drawListSprite.removeChildAt(c);
+			//for (var c:uint = 0; c < glowSprite.numChildren ; c++)
+				//if ((glowSprite.getChildAt(c) as Polygon).getParentObj().ignoreDraw())
+					//glowSprite.removeChildAt(c);
+			//for (var c:uint = 0; c < selectedSprite.numChildren ; c++)
+				//if ((selectedSprite.getChildAt(c) as Polygon).getParentObj().ignoreDraw())
+					//selectedSprite.removeChildAt(c);
 //			glowSprite.graphics.clear();
 
-//			drawListSprite = new Sprite();
-//			drawListSprite.mask = ThreeDApp.CreateMask();
-//			addChild(drawListSprite);
-//			glowSprite = new Sprite();
-//			glowSprite.filters = new Array(filter);
-//			addChild(glowSprite);
-			
 			var sortIndices:Array = new Array();
 			/**********************
 			Sorting
 			***********************/
 			drawList = new Array();
 			var objIndex:Number = 0;
-			for(; objIndex<allObjects.length; objIndex++)
-			{
-				if(!allObjects[objIndex].isActive())
-					continue;
-				allObjects[objIndex].worldTransform(matrixStack, objIndex);
-				allObjects[objIndex].draw();
-			}//for
+//			trace("isDirty():"+isDirty());
+			if(isDirty())
+				for(; objIndex<allObjects.length; objIndex++)
+				{
+					if(allObjects[objIndex].ignoreDraw())
+						continue;
+					allObjects[objIndex].worldTransform(matrixStack, objIndex);
+					allObjects[objIndex].draw();
+				}//for
 			sortDrawList();
 			if (currActiveCube != undefined)
-			{
 				glowSprite.addChild(exitSprite);
-			}
+			else if(glowSprite.contains(exitSprite))
+				glowSprite.removeChild(exitSprite);
 			//painting
 			
 			//trace("liength "+drawList.length);
@@ -368,30 +363,20 @@
                                     inner, 
                                     knockout);
             glowSprite.filters = new Array(filter);
-//			var formerParent:DrawElement = undefined;
-//			var currGlowChild:Sprite = new Sprite();
-//			var currFilter:GlowFilter = (filter.clone() as GlowFilter);
-//			glowSprite.addChild(currGlowChild);
 			for(var drawListIndex:Number=0; drawListIndex<drawList.length; drawListIndex++)
 			{
+				if (drawList[drawListIndex].getParentObj().ignoreDraw())
+				{
+					trace("remove:"+drawListIndex+", "+drawList[drawListIndex]);
+					if (drawList[drawListIndex].parent)
+						drawList[drawListIndex].parent.removeChild(drawList[drawListIndex]);
+				}
 				if (drawList[drawListIndex].getState() != DrawElement.COLLAPSED)
 				{
 					selectedSprite.addChild(drawList[drawListIndex]);
 				}
 				else if(drawList[drawListIndex].getGlowPercentage()>0)//smoothingGroup==8
 				{
-//					if(formerParent==undefined || formerParent!=drawList[drawListIndex].parentObj)
-//					{
-//						currGlowChild = new Sprite(); 
-//						glowSprite.addChild(currGlowChild);
-//						currFilter = (filter.clone() as GlowFilter);
-//					}
-//					currFilter.blurX = currFilter.blurY = drawList[drawListIndex].getGlowPercentage()*30;
-//					currFilter.alpha = drawList[drawListIndex].getGlowPercentage();
-////					glowSprite.filters = new Array(filter);
-//					currGlowChild.filters = new Array(currFilter);
-//					currGlowChild.addChild(drawList[drawListIndex])
-//					formerParent = drawList[drawListIndex].parentObj;
 					filter.blurX = filter.blurY = drawList[drawListIndex].getGlowPercentage()*20;
 					filter.alpha = drawList[drawListIndex].getGlowPercentage()/2;
 					glowSprite.filters = new Array(filter);
@@ -399,8 +384,6 @@
 				}
 				else
 				{
-//					if(drawListIndex+1<numChildren)
-//						drawListSprite.removeChildAt(drawListIndex);
 					drawListSprite.addChild(drawList[drawListIndex]);
 				}
 			} // for object

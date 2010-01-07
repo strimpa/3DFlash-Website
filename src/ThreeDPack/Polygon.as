@@ -160,7 +160,7 @@
 		{
 			if(notMoveable())
 				return;
-			if(parentObj)// && !moving
+			if(parentObj)
 				parentObj.mouseClickHandler(event);
 //			jump();
 //			for(var jumpIndex=0;jumpIndex<this.otherElementParts.length;jumpIndex++)
@@ -221,12 +221,19 @@
 		public override function Process(parent:ThreeDObject=undefined):void
 		{
 			super.Process(parent);
-			if(moving)
+			if(getState()!=COLLAPSED)
 			{
 				parent.SetMovingPolyIndex(this.unsortedIndex);
-				ThreeDCanvas.SetDirty();
 			}
+			if (currColour!=parentObj.currColour || isDirty())
+				parentObj.setDirty();
+				
 			currColour = parentObj.currColour;
+		}
+		
+		public function isDirty():Boolean
+		{
+			return moving;
 		}
 		
 		public override function OnCollapsed():void
@@ -363,29 +370,12 @@
 				//trace(mat.Translation());
 		}
 
-		public function draw(points:Array, normals:Array=undefined):void
+		public function draw(points:Array, normals:Array=undefined, isMoving:Boolean=false):void
 		{
 			graphics.clear(); // clearing for drawing with shading
 			graphics.beginFill(currColour, parentObj.currAlpha);
-//			var colouredBitmap:BitmapData = ThreeDApp.image.bitmapData.clone();//new BitmapData(600,400,true,0xFFFFFFFF);// = ThreeDApp.overlayBitmap;
-//			var matrix:Matrix = new Matrix(); 
-//			matrix.scale(1, 4);
-//			if(moving)
-//			{
-//				var mask:uint = 0x000000FF;
-//				var red:Number = ((colour>>16)&mask);
-//				var green:Number = ((colour>>8)&mask);
-//				var blue:Number = ((colour)&mask);
-//				colouredBitmap.colorTransform(colouredBitmap.rect, new ColorTransform(0,0,0,1,red,green,blue));
-//			}
-//			graphics.beginBitmapFill(colouredBitmap,matrix);
-//			var dep:Number = depth1;
-//						trace("dep:"+dep);
-//					if(dep)graphics.lineStyle((dep<=0?0.5:(dep+200)/100), 0x0000FF, /*(dep<=0?1:7/dep)*10*/100);
-//					else 
-			//graphics.lineStyle(1, parentObj.borderColour, parentObj.currAlpha);
 			// move to first Point
-			var indices:Array = moving?pointMoveIndices:pointIndices;
+			var indices:Array = isMoving?pointMoveIndices:pointIndices;
 			var endPoint:ThreeDPoint = points[indices[0]];
 			if(endPoint==undefined)
 			{	
@@ -408,7 +398,7 @@
 					continue;
 				}
 				//trace("vertIndex:"+vertIndex+", currPoint:"+currPoint.x+", "+currPoint.y);
-				if(renderTheEdge)// || moving
+				if(renderTheEdge)
 					graphics.lineStyle(2, parentObj.borderColour, parentObj.currAlpha);
 				else
 					graphics.lineStyle(1, parentObj.borderColour, 0);

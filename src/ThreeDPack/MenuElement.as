@@ -16,17 +16,17 @@ package ThreeDPack
 				ThreeDApp.resetCurves();
 			super.mouseClickHandler(event);
 		}
-		public override function OnCollapsed():void
+		public override function OnCollapsing():void
 		{
 			CubeCollection.setCubesActive(false, ""+category);
 			Obj2As.setObjectsActive(true);
-			super.OnCollapsed();
+			super.OnCollapsing();
 		}
-		public override function OnExtended():void
+		public override function OnExtending():void
 		{
 			CubeCollection.setCubesActive(true, ""+category);
 			Obj2As.setObjectsActive(false);
-			super.OnExtended();
+			super.OnExtending();
 		}
 	}
 }
