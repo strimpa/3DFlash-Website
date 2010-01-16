@@ -5,16 +5,20 @@ package
 	 */
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
+	import ThreeDPack.CubeCollection;
+	import ThreeDPack.Obj2As;
 	import ThreeDPack.ThreeDPoint;
 
 	public class KeywordManager extends Sprite{
-		private var keywords:Array = ["progamming", "web", "3D", "uni", "design"];
+		private var keywords:Array = ["film", "progamming", "3D", "design", "uni", "web"];
 		static private var menuMovie:Sprite;
 		private var localOrigin:Point;
 		private var middle:ThreeDPoint = ThreeDApp.spectrumMiddle;
 		private var spriteMiddle:ThreeDPoint = new ThreeDPoint(220, 110, 0);
+		private var buttons:Array;
 		static private var movements:Array;
 
 		public function KeywordManager(parent:Sprite)
@@ -44,11 +48,58 @@ package
 			movements = new Array(menuMovie.numChildren);
 //			displayData.x = -spriteMiddle.x;//-localOrigin.x;
 //			displayData.y = -middle.y;//+localOrigin.y;
-			trace("loaded a menupoint");
+			buttons = new Array(menuMovie.numChildren);
+			var firstRadius:uint = 200;
+			var secondRadius:uint = 210;
+			for (var i:uint = 0; i < menuMovie.numChildren; i++ )
+			{
+				var rand:Number = Math.random();
+				trace(rand);
+				var buttonSprite:Sprite = new Sprite();
+				buttonSprite.graphics.beginFill(0x888888, 0.5);
+				buttonSprite.graphics.lineStyle(0.5, 0xFFFFFF, 0);
+				buttonSprite.graphics.drawCircle(0, 0, firstRadius);
+				buttonSprite.graphics.lineStyle(0.5, 0xFFFFFF, 1);
+				buttonSprite.graphics.drawCircle(0, 0, secondRadius);
+				buttonSprite.graphics.endFill();
+				buttonSprite.alpha = 0.1;
+				buttonSprite.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler,false, 1);
+				buttonSprite.addEventListener(MouseEvent.MOUSE_MOVE, mouseOverHandler,false, 1);
+				buttonSprite.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler, false, 0);
+				buttonSprite.addEventListener(MouseEvent.MOUSE_DOWN, mouseClickHandler, false, 2);
+				buttonSprite.name = "number:" + i;
+				buttons[i] = buttonSprite;
+				addChild(buttons[i]);
+				firstRadius += 10;
+				secondRadius += 10;
+			}
 		}
-		
-		public function rotateMenuPoint(dobj:DisplayObject, pointNo:Number, rotInRad:Number):void
+		public function mouseOverHandler(e:MouseEvent):void
 		{
+			if (ProgressTracker.scopeType == ProgressTracker.CATEGORY_SCOPE)
+				return;
+			if(ProgressTracker.getState()==ProgressTracker.START)
+				ProgressTracker.setState(ProgressTracker.SCOPE_SELECT);
+			e.target.alpha = 0.2; 
+		}
+		public function mouseOutHandler(e:MouseEvent):void
+		{ 
+			if (ProgressTracker.scopeType == ProgressTracker.CATEGORY_SCOPE)
+				return;
+			if (ProgressTracker.getState()<=ProgressTracker.SCOPE_SELECT)
+				ProgressTracker.setState(ProgressTracker.START);
+			e.target.alpha = 0.1; 
+		}
+		public function mouseClickHandler(e:MouseEvent):void 
+		{
+			if (ProgressTracker.scopeType == ProgressTracker.CATEGORY_SCOPE)
+				return;
+			var key:String = keywords[buttons.indexOf(e.target)]
+			CubeCollection.setCubesActiveByKeyword(true, key);
+			ProgressTracker.setState(ProgressTracker.SCOPE_SELECTED);
+			ProgressTracker.scopeType = ProgressTracker.KEYWORD_SCOPE;
+			ProgressTracker.lastChosenKeyword = key;
+			Obj2As.setObjectsActiveByCategory(-1, true);
 		}
 		
 		public function Update(mousePos:Point, currentKeywords:Array):void
