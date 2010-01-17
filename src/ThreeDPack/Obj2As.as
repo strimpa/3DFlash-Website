@@ -11,7 +11,7 @@
 		static var httpStatus:Number;
 		static var lorem_lv:TargetLoadVars;
 		static var my_txt:String;
-		static var objects:Array;
+		public static var objects:Array;
 	
 		public function Obj2As(filePath:String):void
 		{
@@ -35,11 +35,14 @@
 			//trace("that");
 		}
 		
-		static private function endObject(obj:ThreeDObject, normalsCalculated, smoothingGroupsPresent):void
+		static private function endObject(obj:MenuElement, normalsCalculated:Boolean, smoothingGroupsPresent:Boolean, category:uint):void
 		{
+			trace("ended Object:" + obj.name);
+			objects.push(obj);
+			obj.category = category;
 			obj.calcDepth();
 			
-			// Set the flag to have no normals artificially calculated
+			// Set the flag to have the normals NOT artificially calculated
 			if(normalsCalculated)
 				obj.normalsCalculated = true;
 			obj.calcMoveVecs();
@@ -50,12 +53,14 @@
 			ThreeDCanvas.appendToObjects(obj);
 		}
 
-		static function setObjectsActive(act:Boolean=true)
+		public static function setObjectsActiveByCategory(cat:int, act:Boolean=true)
 		{
-			for each(var anObject:ThreeDObject in objects)
+			for each(var anObject:MenuElement in objects)
 			{
-				if(!anObject.moving)
+				if(anObject.category==cat)
 					anObject.setActive(act);
+				else
+					anObject.setActive(!act);
 			}
 		}
 		
@@ -74,35 +79,25 @@
 				var vertIndex:Number=0;
 				var normalIndex:Number=0;
 				var polyIndex:Number=0;
-				var objectIndex:Number=0;
+				var objectIndex:Number = 0;
+				var faceCollectionInProgress:Boolean = false;
 				for(var lineIndex:Number=0; lineIndex<lines.length;lineIndex++){
 					var values:Array;
 					ThreeDApp.output(lines[lineIndex]);
 //					trace(lines[lineIndex]);
+					lines[lineIndex] = globals.stripString(lines[lineIndex]);
 					if(lines[lineIndex].charAt(0)=="g") // object
 					{
 //						if(newObject!=undefined)
 							
 						var name:String = lines[lineIndex].substring((lines[lineIndex].indexOf(" ")+1), 
 												  						lines[lineIndex].length);
-						if(lines[lineIndex].length>1)
+						//if(lines[lineIndex].length>1)
 						{
 							newObject.name = name; 
-							ThreeDApp.output("new Object:"+name);
+							//ThreeDApp.output
+							trace("new Object:"+name);
 						}
-						else
-						{
-							newObject.category = objectIndex++;
-							objects.push(newObject);
-							endObject(newObject, normalIndex!=0, currSmoothingGroup>0);
-							newObject = new MenuElement();
-							newObject.normals = new Array();
-							normalIndex = 0;
-							vertIndex = 0;
-							polyIndex = 0;
-							ThreeDApp.output("ended Object:"+newObject.name);
-						}
-						
 					}
 					else if(lines[lineIndex].charAt(0)=="s") // smoothing group
 					{
@@ -120,16 +115,31 @@
 						normalIndex++;
 //						trace("normalIndex:"+normalIndex+", newObject.normals.length:"+newObject.normals.length);
 					}
-					else if(lines[lineIndex].charAt(0)=="v")
+					else if(lines[lineIndex].indexOf("v ")==0)
 					{
+						if (faceCollectionInProgress)
+						{
+							//ThreeDApp.output
+							endObject(newObject, normalIndex!=0, currSmoothingGroup>0, objectIndex++);
+							newObject = new MenuElement();
+							newObject.normals = new Array();
+							normalIndex = 0;
+							vertIndex = 0;
+							polyIndex = 0;
+							faceCollectionInProgress = false;
+						}
+
 						values = (lines[lineIndex].substring((lines[lineIndex].indexOf(" ")+2), 
 												  						lines[lineIndex].length)
 							   					).split(" ");
 						newObject.points[vertIndex++] = new ThreeDPoint(values[0], values[1], values[2]);
+//						trace("vertIndex:"+vertIndex+", newObject.points[vertIndex]:"+newObject.points[vertIndex-1]);
 					}
 					else if(lines[lineIndex].charAt(0)=="f")
 					{
 						// face information
+						lines[lineIndex] = globals.stripString(lines[lineIndex]);
+						faceCollectionInProgress = true;
 						var faces:Array = new Array();
 						var uVs:Array = new Array();
 						var newNormals:Array = new Array();
@@ -137,10 +147,12 @@
 																	  	lines[lineIndex].length)
 							   					).split(" ");
 					
+						trace(values);
 						// vert index/ UV/ normal
 						for(var infoSplitInd:Number=0;infoSplitInd<values.length;infoSplitInd++)
 						{
 							var info:Array = values[infoSplitInd].split("/");
+							trace(info);
 							faces[infoSplitInd] = info[0];
 							if(info.length>1)
 								uVs[infoSplitInd] = info[1];
@@ -154,11 +166,14 @@
 						var lowerInd:Number;
 						for(lowerInd=0;lowerInd<faces.length;lowerInd++)
 						{
-							faces[lowerInd] = new Number(newObject.points.length)+new Number(faces[lowerInd]);
+							faces[lowerInd] = new Number(newObject.points.length) + new Number(faces[lowerInd]); // relative numbers for
+							trace("vertIndex:"+faces[lowerInd]+", newObject.points[faces[lowerInd]]:"+newObject.points[faces[lowerInd]]);
 						}
 						for(lowerInd=0;lowerInd<newNormals.length;lowerInd++)
 						{
-							newNormals[lowerInd] = new Number(newObject.normals.length)+new Number(newNormals[lowerInd]);
+							if (newNormals[lowerInd] == undefined || newNormals[lowerInd] == 0)
+								trace("newNormals[lowerInd] == undefined before -1:"+lowerInd+", "+newNormals[lowerInd]);
+							newNormals[lowerInd] = new Number(newObject.normals.length) + new Number(newNormals[lowerInd]);
 						}
 						newObject.addPoly(new Polygon(faces, polyIndex, newObject, newNormals));
 						newObject.polygons[polyIndex].smoothingGroup = currSmoothingGroup;
@@ -168,7 +183,7 @@
 //				trace("point count:"+this.points.length+"\n poly count:"+this.polygons.length);
 			}
 			
-			endObject(newObject, normalIndex!=0, currSmoothingGroup>0);
+			endObject(newObject, normalIndex!=0, currSmoothingGroup>0, objectIndex++);
 			
 			ThreeDApp.output("Obj2As parsed:"+filePath);
 		}
