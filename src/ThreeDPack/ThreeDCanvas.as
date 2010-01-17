@@ -2,6 +2,7 @@
 {
 	//import flash.display.MovieClip;
 	import flash.display.*;
+	import flash.filters.BlurFilter;
 	import flash.geom.Point;
 	import flash.text.TextField;
 	import flash.system.Security;
@@ -25,7 +26,7 @@
 		public static var glowSprite:Sprite;
 		public static var selectedSprite:Sprite;
 		private static var exitSprite:Sprite;
-		private static var currActiveCube:Cube;
+		public static var currActiveCube:Cube;
 		
 		var colour:Number;
 		
@@ -104,7 +105,7 @@
 			addChild(drawListSprite);
 			glowSprite = new Sprite();
 			glowSprite.cacheAsBitmap = true;
-			glowSprite.filters = new Array(filter);
+//			glowSprite.filters = new Array(filter);
 			addChild(glowSprite);
 			selectedSprite = new Sprite();
 			selectedSprite.cacheAsBitmap = true;
@@ -112,31 +113,34 @@
 			
 //			drawListSprite.mask = ThreeDApp.CreateMask(ThreeDApp.spectrumMiddle);
 			
-			exitSprite = new Sprite();
+			//exitSprite = new Sprite();
 			//exitSprite.graphics.beginFill(0xFF0000);
 			//exitSprite.graphics.drawRect(0, 0, 50, 50);
 			//exitSprite.graphics.endFill();
-			exitSprite.addEventListener(MouseEvent.CLICK, exitHandler);
-			exitSprite.x = 700;
-			exitSprite.y = 100;
+			//exitSprite.addEventListener(MouseEvent.CLICK, exitHandler);
+			//exitSprite.x = 700;
+			//exitSprite.y = 100;
 //			this.cacheAsBitmap = true;
 			
 		}
 		
 		public static function exitSpriteLoaded(data:Object):void
 		{
-			exitSprite.addChild(data as Sprite);
+//			exitSprite.addChild(data as Sprite);
 //			exitSprite.getChildAt(0).blendMode = BlendMode.MULTIPLY;
 		}
-		public static function showExitSprite(cube:Cube):void
+		public static function setActiveCube(cube:Cube):void
 		{
 			currActiveCube = cube;
 		}
 		
-		public function exitHandler(event:Event)
+		public static function exitHandler(event:Event)
 		{
-			currActiveCube.jump();
+			trace("currActiveCube:" + currActiveCube);
+			if(currActiveCube)
+				currActiveCube.jump();
 			currActiveCube = undefined;
+			ProgressTracker.setState(ProgressTracker.SCOPE_SELECTED);
 		}
 		
 		static public function appendToObjects(item:ThreeDObject):void
@@ -160,18 +164,18 @@
 		
 		public function toggleGlow():void
 		{
-			trace(allObjects[0].filters);
-			if(allObjects[0].filters == "")
-			{
-				var glow:GlowFilter = new GlowFilter();
-				glow.color = 0xFFFFFF;
-				glow.quality = 1;
-				glow.alpha = 0.3;
-				glow.blurX = glow.blurY = 20;
-				allObjects[0].filters = new Array(glow);
-			}
-			else
-				allObjects[0].filters = new Array();
+			//trace(allObjects[0].filters);
+			//if(allObjects[0].filters == "")
+			//{
+				//var glow:GlowFilter = new GlowFilter();
+				//glow.color = 0xFFFFFF;
+				//glow.quality = 1;
+				//glow.alpha = 0.3;
+				//glow.blurX = glow.blurY = 20;
+				//allObjects[0].filters = new Array(glow);
+			//}
+			//else
+				//allObjects[0].filters = new Array();
 		}
 		
 		public function load():void
@@ -341,10 +345,10 @@
 					allObjects[objIndex].draw();
 				}//for
 			sortDrawList();
-			if (currActiveCube != undefined)
-				glowSprite.addChild(exitSprite);
-			else if(glowSprite.contains(exitSprite))
-				glowSprite.removeChild(exitSprite);
+			//if (currActiveCube != undefined)
+				//glowSprite.addChild(exitSprite);
+			//else if(glowSprite.contains(exitSprite))
+				//glowSprite.removeChild(exitSprite);
 			//painting
 			
 			//trace("liength "+drawList.length);
@@ -354,7 +358,7 @@
 			***********************/
 			//var glowPercentage:Number=0;
 			// set glowSprite to top
-			var filter:GlowFilter = new GlowFilter(filtercolor, 
+			var filter:GlowFilter = new GlowFilter(DrawElement.mouseOverColour,
                                     0, 
                                     blurX, 
                                     blurY, 
@@ -362,7 +366,12 @@
                                     quality, 
                                     inner, 
                                     knockout);
-            glowSprite.filters = new Array(filter);
+			//var filter:BlurFilter = new BlurFilter(
+                                    //blurX, 
+                                    //blurY, 
+                                    //quality
+									//);
+            //glowSprite.filters = new Array(filter);
 			for(var drawListIndex:Number=0; drawListIndex<drawList.length; drawListIndex++)
 			{
 				if (drawList[drawListIndex].getParentObj().ignoreDraw())
@@ -371,20 +380,25 @@
 					if (drawList[drawListIndex].parent)
 						drawList[drawListIndex].parent.removeChild(drawList[drawListIndex]);
 				}
-				if (drawList[drawListIndex].getState() != DrawElement.COLLAPSED)
-				{
-					selectedSprite.addChild(drawList[drawListIndex]);
-				}
-				else if(drawList[drawListIndex].getGlowPercentage()>0)//smoothingGroup==8
-				{
-					filter.blurX = filter.blurY = drawList[drawListIndex].getGlowPercentage()*20;
-					filter.alpha = drawList[drawListIndex].getGlowPercentage()/2;
-					glowSprite.filters = new Array(filter);
-					glowSprite.addChild(drawList[drawListIndex]);
-				}
+				//if (drawList[drawListIndex].getGlowPercentage() > 0 || 
+					//(drawList[drawListIndex].filters[0] && drawList[drawListIndex].filters[0].blurX>0))//smoothingGroup==8
+				//{
+//					trace("glowPercentage:" + drawList[drawListIndex].getGlowPercentage());
+					//filter.blurX = filter.blurY = drawList[drawListIndex].getGlowPercentage()*20;
+					//filter.alpha = drawList[drawListIndex].getGlowPercentage();
+					//drawList[drawListIndex].filters = new Array(filter);
+					//glowSprite.addChild(drawList[drawListIndex]);
+				//}
 				else
 				{
-					drawListSprite.addChild(drawList[drawListIndex]);
+					if (drawList[drawListIndex].getState() != DrawElement.COLLAPSED)
+					{
+						selectedSprite.addChild(drawList[drawListIndex]);
+					}
+					else
+					{
+						drawListSprite.addChild(drawList[drawListIndex]);
+					}
 				}
 			} // for object
 			
