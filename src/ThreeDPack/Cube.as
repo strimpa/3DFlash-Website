@@ -87,7 +87,12 @@
 			lastDragPos = new Point();
 			jumpLength = CAM_MOVE_LENGTH;
 		}
-		
+
+		public function resetTitleSprite():void
+		{
+			myTitleSprite = undefined;
+		}
+
 		public function getCurrFacingPoly():uint
 		{
 			return currFacingPoly;
@@ -118,12 +123,6 @@
 			return polygons[0].getState() != COLLAPSED;
 		}
 
-		protected override function objToProj(matrixStack:Array):void
-		{
-			super.objToProj(matrixStack);
-			this.position = goThroughPoints(matrixStack, new ThreeDPoint(0,0,0));
-		}
-		
 		public function setText(text:String, index:uint):void
 		{
 			var polyIndex = index;
@@ -151,6 +150,9 @@
 		
 		public override function mouseClickHandler(event:MouseEvent):void
 		{
+			ProgressTracker.setState(ProgressTracker.CONTENT_SELECTED);
+			if(ThreeDCanvas.currActiveCube==undefined)
+				ThreeDCanvas.setActiveCube(this);
 			if (getState() == EXTENDED)
 			{
 				collapsePolygons(COLLAPSED, startRotationMode);
@@ -166,7 +168,7 @@
 				myContent.setText(currFacingPoly);
 			}
 
-			if(!isActive() || getState()!=COLLAPSED)
+			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this!=ThreeDCanvas.currActiveCube))
 				return;
 
 			ThreeDApp.output("Content clicked:"+myContent.mTitle);
@@ -178,10 +180,13 @@
 		public override function mouseOverHandler(event:MouseEvent):void
 		{
 			mouseIsOverMe = true;
-			super.mouseOverHandler(event);
+//			super.mouseOverHandler(event);
 
-			if(!isActive() || getState()!=COLLAPSED)
+			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this!=ThreeDCanvas.currActiveCube))
 				return;
+
+			ProgressTracker.setState(ProgressTracker.CONTENT_SELECT);
+
 			if(!titleInvoked)
 				invokeTitleShow();
 				
@@ -211,9 +216,12 @@
 //				trace("currCubeRot:"+currCubeRot);
 			}
 			lastDragPos = new Point(event.stageY, event.stageX);
-			
-			if(!isActive() || getState()!=COLLAPSED)
+
+			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this!=ThreeDCanvas.currActiveCube))
 				return;
+
+			ProgressTracker.setState(ProgressTracker.CONTENT_SELECT);
+
 			if(!titleInvoked)
 				invokeTitleShow();
 
@@ -222,7 +230,12 @@
 		
 		public override function mouseOutHandler(event:MouseEvent):void
 		{
-//			trace("mouse out");
+			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this!=ThreeDCanvas.currActiveCube))
+				return;
+			if (getState() == COLLAPSED)
+			{
+				ProgressTracker.setState(ProgressTracker.SCOPE_SELECTED);
+			}
 			mouseIsOverMe = false;
 			super.mouseOutHandler(event);
 		}
@@ -330,6 +343,7 @@
 		{
 			ThreeDCanvas.rotFlag = false;
 			CubeCollection.setCubeActive(true, collectionIndex);
+			ThreeDCanvas.setActiveCube(this);
 //			setMask(undefined);
 			CurvedLineManager.doReset();
 			CurvedLineManager.setGuide(true);
@@ -340,7 +354,6 @@
 			extendPolygons();
 			this.myContent.load();
 //			polygons[0].setCallback(EXTENDED, this.showContent);
-			ThreeDCanvas.showExitSprite(this);
 			super.OnExtended();
 		}
 		
@@ -363,7 +376,10 @@
 		}
 		public override function OnCollapsed():void
 		{
-			CubeCollection.setCubesActive(true, myContent.mCategory);
+			if(ProgressTracker.scopeType==ProgressTracker.CATEGORY_SCOPE)
+				CubeCollection.setCubesActiveByCategory(true, myContent.mCategory);
+			else
+				CubeCollection.setCubesActiveByKeyword(true, ProgressTracker.lastChosenKeyword);
 			super.OnCollapsed();
 		}
 
@@ -397,7 +413,7 @@
 				return;
 			titleInvoked = true;
 			var title:String = myContent.mTitle;
-			myTitleSprite = TitleFieldManager.showTitleAtPoint(title, this);
+			myTitleSprite = TitleFieldManager.showTitleAtPoint(title, this, position);
 		}
 	}
 }
