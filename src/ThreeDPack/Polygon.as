@@ -80,8 +80,12 @@
 			faceNormal = new ThreeDPoint(0,0,0);
 			for(var normalIndex:Number=0;normalIndex<normalIndices.length;normalIndex++)
 			{
-//				trace("normalIndex:"+normalIndex+", normalIndex:"+normalIndices[normalIndex]);
-//				trace("parentObj.normals[normalIndices[normalIndex]]:"+parentObj.normals[normalIndices[normalIndex]]);
+				if (undefined == parentObj.normals[normalIndices[normalIndex]])
+				{
+//					trace("normalIndex:"+normalIndex+", normalIndex:"+normalIndices[normalIndex]);
+					trace("normalIndex:"+normalIndex+", normalIndex:"+normalIndices[normalIndex]+", parentObj.normals[normalIndices[normalIndex]]:" + parentObj.normals[normalIndices[normalIndex]]);
+					continue;
+				}
 				faceNormal = faceNormal.plus(parentObj.normals[normalIndices[normalIndex]]);
 			}
 			faceNormal.divideMe(normalIndices.length);
@@ -233,7 +237,8 @@
 		
 		public function isDirty():Boolean
 		{
-			return moving;
+			var back:Boolean = moving || (titleField && titleField.alpha < 1);
+			return back;
 		}
 		
 		public override function OnCollapsed():void
@@ -241,7 +246,7 @@
 			if(parentObj!=undefined)
 			{
 				parentObj.ResetMovingPolyIndex(this.unsortedIndex);
-				currColour = parentObj.inactiveColour;
+				currColour = DrawElement.inactiveColour;
 			}
 			if(textField && textSprite.contains(textField))
 			{
@@ -266,11 +271,11 @@
 			super.OnExtending();
 		}
 		
-		public override function OnExtended():void
-		{
-			ThreeDCanvas.showExitSprite(this.parentObj as Cube);
-		}
-		
+		//public override function OnExtended():void
+		//{
+			//ThreeDCanvas.showExitSprite(this.parentObj as Cube);
+		//}
+		//
 		public function setText(text:String)
 		{
 			if(!textField)
@@ -332,12 +337,14 @@
 			if(titleField && contains(titleField))
 				removeChild(titleField);
 			titleField = new TextField();
+			titleField.selectable = false;
 			titleField.autoSize = TextFieldAutoSize.LEFT;
 			titleField.embedFonts = true;
 			titleField.defaultTextFormat = globals.textformatCubeTitle;
 			titleField.blendMode = BlendMode.LAYER;
 			this.addChild(titleField);
 			titleField.text = header;
+			titleField.alpha = 0;
 		}
 		public function resetHeader():void
 		{
@@ -373,6 +380,7 @@
 		public function draw(points:Array, normals:Array=undefined, isMoving:Boolean=false):void
 		{
 			graphics.clear(); // clearing for drawing with shading
+//			trace("Polygon::draw()");
 			graphics.beginFill(currColour, parentObj.currAlpha);
 			// move to first Point
 			var indices:Array = isMoving?pointMoveIndices:pointIndices;
@@ -418,6 +426,8 @@
 			{
 				titleField.x = minPoint.x;
 				titleField.y = minPoint.y - 30;
+				if (titleField.alpha < 1)
+					titleField.alpha += 0.1;
 			}
 			if (textField)
 			{
