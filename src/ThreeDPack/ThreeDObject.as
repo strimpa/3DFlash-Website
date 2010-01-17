@@ -74,10 +74,6 @@
 				this.currColour = mouseOverColour;
 			else
 				this.currColour = inactiveColour;
-			for(var jumpIndex=0;jumpIndex<this.polygons.length;jumpIndex++)
-			{
-				this.polygons[jumpIndex].currColour = this.currColour;
-			}
 		}
 		
 		public function addPoly(poly:Polygon):void
@@ -130,8 +126,21 @@
 			currActiveObject = -1;
 		}
 		
+		override public function OnExtended():void
+		{
+			currColour = inactiveColour;
+			super.OnExtended();
+		}
+		
+		override public function set focusRect(value:Object):void 
+		{
+			super.focusRect = value;
+		}
+		
 		protected function objToProj(matrixStack:Array):void
 		{
+			this.position = goThroughPoints(matrixStack, new ThreeDPoint(0,0,0));
+
 			var pointAlreadyCalculated:Array = new Array(points.length);
 			for(var pointIndex:Number=0; pointIndex<points.length; pointIndex++)
 			{
@@ -294,6 +303,7 @@
 
 		public function calcMoveVecs():void
 		{
+			trace("polygons.length:"+polygons.length);
 			for(var moveIndPoly:Number=0;moveIndPoly<polygons.length;moveIndPoly++)
 			{
 				if(!normalsCalculated)
@@ -317,7 +327,7 @@
 			if(!isMovable)
 				return;
 			ThreeDApp.SetOverObject();
-			if(getState()==COLLAPSED)
+			if(!moving)
 			{
 				currColour = mouseOverColour;
 			}
@@ -328,7 +338,7 @@
 		{
 			if(!isMovable)
 				return;
-			if(getState()==COLLAPSED)
+			if(!moving)
 			{
 				currColour = inactiveColour;
 			}
@@ -339,7 +349,7 @@
 		{
 			if(!isMovable)
 				return;
-			trace(currActiveObject);
+			trace("currActiveObject:"+currActiveObject);
 			if (currActiveObject==origObjInd || -1==currActiveObject)
 			{
 				jump();
@@ -436,7 +446,7 @@
 				this.pendingMovements[jumpIndex]=new ThreeDMatrix();
 				var multiplier:Number=1/(jumpIndex+1);
 				var rotMat:ThreeDMatrix=new ThreeDMatrix();
-				rotMat.rotate(multiplier*20,0,0);
+				rotMat.rotate(multiplier*47,0,0);
 				this.pendingMovements[jumpIndex] = formerMat = formerMat.mul(rotMat);
 				//this.pendingMovements[jumpIndex].scale(multiplier,multiplier,multiplier);
 			}
