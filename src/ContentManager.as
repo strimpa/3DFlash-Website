@@ -28,11 +28,11 @@ package
 			queue = new Array();
 			loadVars = new TargetLoadVars(this);
 			loadSwf = new TargetLoad(this);
+			LoadObject("FontLoad.swf", swf, undefined, fontInit);
 			LoadObject("bg.jpg", swf, undefined, ThreeDApp.addToBackground);
 			LoadObject("baloo.swf", swf, undefined, ThreeDApp.addToBackground);
-			LoadObject("FontLoad.swf", swf, undefined, fontInit);
 			LoadObject("content.xml", xml, contentXML, ThreeDApp.InitCanvas);
-			LoadObject("skull.obj", sceneData, undefined, ThreeDPack.Obj2As.onData);
+			LoadObject("sphere.obj", sceneData, undefined, ThreeDPack.Obj2As.onData);
 			LoadObject("html/contentStyle_as.css", css, undefined, Content.contentStyleLoaded);
 			LoadObject("barock.swf", swf, undefined, Content.contentBGLoaded);
 			LoadObject("exit.swf", swf, undefined, ThreeDCanvas.exitSpriteLoaded);
@@ -67,20 +67,17 @@ package
 				var item:Object = queue[0];
 				if(item[storage]!=undefined)
 				{
-					trace("item.storage!=undefined");
+//					trace("item.storage!=undefined");
 					if(item[type]==xml)
 						contentXML = XML(data as String);
-					//else	
-						//loadSwf.loadItem(item.target);
 				}
 				else
 				{
 					trace("item.storage==undefined");
 				}
-			    trace("))))))))))))))))))))))))))))))))))))))) XML Data loaded.");
 			    if(item[callback]!=undefined)
 			    {
-			    	trace("item.callback!=undefined:"+item[callback]);
+//			    	trace("item.callback!=undefined:"+item[callback]);
 			    	item[callback](data);
 			    }
 			    else
@@ -108,6 +105,7 @@ package
 				}		
 				trace("loaded");
 				ThreeDApp.InitGlobals();
+				ThreeDApp.loader.initTitle();
 		}
 		
 
@@ -117,7 +115,9 @@ package
 			var xmlitem:XML = contentXML.content[number];
 			content.mTitle = xmlitem.title;
 			content.mCategory = xmlitem.category;
-			content.mKeywords = [xmlitem.keywords];
+			var keywordString:String = xmlitem.keywords;
+			trace("content.mKeywords:"+keywordString);
+			content.mKeywords = keywordString.split(",");//
 			content.mContentUrl = xmlitem.url;
 			return content;
 		}

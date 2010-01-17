@@ -43,15 +43,27 @@ package ThreeDPack
 		{
 		}
 		
-		static function setCubesActive(act:Boolean, keyword:String)
+		public static function setCubesActiveByCategory(act:Boolean, keyword:String)
 		{
 			for each(var aCube:Cube in mCubes)
 			{
 				if(aCube.getContent().mCategory == keyword)
 					aCube.setActive(act);
+				else
+					aCube.setActive(!act);
 			}
 		}
-		static function setCubeActive(act:Boolean, index:uint)
+		public static function setCubesActiveByKeyword(act:Boolean, keyword:String)
+		{
+			for each(var aCube:Cube in mCubes)
+			{
+				if (aCube.getContent().mKeywords.indexOf(keyword) != -1)
+					aCube.setActive(act);
+				else
+					aCube.setActive(!act);
+			}
+		}
+		public static function setCubeActive(act:Boolean, index:int)
 		{
 			for (var cubeIndex=0; cubeIndex < mCubes.length; cubeIndex++ )
 			{

@@ -34,7 +34,7 @@
 		
 		private var animating:Boolean=false;
 		public var animIndex:Number=0;
-		private const animDuration:Number = 10;
+		private const animDuration:Number = 5;
 		
 		public var myCanvas:Sprite;
 		

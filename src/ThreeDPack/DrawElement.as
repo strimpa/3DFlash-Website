@@ -23,9 +23,9 @@ package ThreeDPack
 		protected var active:Boolean = false; 
 
 		public var currColour:Number;
-		public var mouseOverColour:Number = 0x4f3333;
-		public var movingColour:Number = 0x3F3333;
-		public var inactiveColour = 0x333333;
+		public static var mouseOverColour:Number = 0x66666f;
+		public static var movingColour:Number = 0x363333;
+		public static var inactiveColour = 0x333333;
 		public var borderColour:Number;
 		public var myObj:ThreeDObject;
 		public var jumpLength:Number = 10;

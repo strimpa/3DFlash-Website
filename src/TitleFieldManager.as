@@ -3,6 +3,7 @@ package
 	/**
 	 * @author Gunnar
 	 */
+	import flash.events.TextEvent;
 	import flash.text.*;
 	import flash.geom.Point;
 	import flash.display.Sprite;
@@ -11,6 +12,7 @@ package
 	import ThreeDPack.ThreeDPoint;
 	import ThreeDPack.CurvedLineManager;
 	import ThreeDPack.Cube;
+	import ThreeDPack.ThreeDObject;
 	import flash.events.MouseEvent;
 
 	public class TitleFieldManager 
@@ -42,21 +44,20 @@ package
 				mTitleTextFields[tf].x = 0;
 				mTitleTextFields[tf].y = 0;
 				mTitleTextFields[tf].addChild(field);
-				ThreeDApp.overlaySprite.addChild(mTitleTextFields[tf]);
 				mFieldFading[tf] = false;
 				
 				inited=true;
 			}
 		}
 		
-		public static function showTitleAtPoint(title:String, cube:Cube ):Sprite
+		public static function showTitleAtPoint(title:String, cube:ThreeDObject, pos:ThreeDPoint):Sprite
 		{
 			if(!inited)
 				return undefined;
 
 			var one:ThreeDPoint,two:ThreeDPoint;
-			one = cube.position;
-			two = cube.position.plus(new ThreeDPoint(100+Math.random()*100,100+Math.random()*100));
+			one = pos;
+			two = pos.plus(new ThreeDPoint(100+Math.random()*100,100+Math.random()*100));
 			var one2d:Point = new Point(one.x,one.y);
 			var two2d:Point =  new Point(two.x,two.y);
 			var dist = two2d.subtract(one2d);
@@ -66,11 +67,21 @@ package
 			for each(var tf:Sprite in mTitleTextFields)
 			{
 				inactive = tf;
-				if(tf.alpha<0.2)
+				if(tf.alpha<=0)
 					break;
 				index++;
 			}
-			mFieldFading[index] = false;
+			if (index >= mTitleTextFields.length)
+				return undefined;
+			for each(var tf:Sprite in mTitleTextFields)
+			{
+				if (tf != inactive && tf != undefined)
+					fadeOutTitle(tf);
+			}
+			ThreeDApp.overlaySprite.addChild(inactive);
+			var inactiveIndex:int = mTitleTextFields.indexOf(inactive);
+			trace("new textfield "+title+" at "+inactiveIndex);
+			mFieldFading[inactiveIndex] = false;
 			var theTextField:TextField =(inactive.getChildByName("textfield") as TextField); 
 			theTextField.text = title;
 			//theTextField.border = 2;
@@ -91,7 +102,7 @@ package
 				//begin_p, control1_p, control2_p, end_p
 					one2d,
 					one2d.add(new Point(Math.random()*dist.x,Math.random()*dist.y)),
-					one2d.add(new Point(Math.random()*dist.x,Math.random()*dist.y)),
+					two2d.subtract(new Point(100,0)),//one2d.add(new Point(Math.random()*dist.x,Math.random()*dist.y)),
 					two2d,
 					inactive
 				);
@@ -125,10 +136,17 @@ package
 			if(!inited)
 				return false;
 			var index:Number = mTitleTextFields.indexOf(field); 
+//			trace("fadeOutTitle:"+field+" at "+index);
 			if(index!=-1)
 			{
-				field.removeEventListener(MouseEvent.MOUSE_OVER, mCubes[index].mouseOverHandler);
+				if(field.hasEventListener(MouseEvent.MOUSE_OVER))
+					field.removeEventListener(MouseEvent.MOUSE_OVER, mCubes[index].mouseOverHandler);
 				mFieldFading[index] = true;
+				if (mCubes[index] != undefined)
+				{
+					mCubes[index].resetTitleSprite();
+					mCubes[index] = undefined;
+				}
 				return true;
 			}
 			else
@@ -147,12 +165,15 @@ package
 				if(mFieldFading[tf])
 				{
 					mTitleTextFields[tf].alpha -= 0.1;
-					if (mTitleTextFields[tf].alpha <= 0)
-					{
-						mTitleTextFields[tf].graphics.clear();
+				}
+				if (mTitleTextFields[tf].alpha < 0)
+				{
+					mTitleTextFields[tf].graphics.clear();
+					if (ThreeDApp.overlaySprite.contains(mTitleTextFields[tf]))
+						ThreeDApp.overlaySprite.removeChild(mTitleTextFields[tf]);
 //						trace("mTitleTextFields[tf].alpha <= 0");
-						mFieldFading[tf] = false;
-					}
+					mFieldFading[tf] = false;
+					mTitleTextFields[tf].alpha = 0;
 				}
 			}
 		}

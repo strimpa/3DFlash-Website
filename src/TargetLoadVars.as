@@ -27,7 +27,7 @@
 		public function loadItem(item:String)
 		{
 			objectName = item;
-			load(new URLRequest("http://www.gunnardroege.de/"+item));//"http://www.gunnardroege.de/3DEngine/bin/"+item)); //http://localhost/website/3DEngine/bin
+			load(new URLRequest("http://192.168.1.4/website/3DEngine/bin/"+item));//"http://www.gunnardroege.de/3DEngine/bin/"+item)); //http://localhost/website/3DEngine/bin
 		    ThreeDApp.loader.registerLoadingItem(objectName);
 		}
 
@@ -40,7 +40,8 @@
 			dispatcher.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler, false, 0, true);
         }
 
-        private function completeHandler(event:Event):void {
+        private function completeHandler(event:Event):void
+		{
 			ThreeDApp.loader.unRegisterLoadingItem(objectName);
             var loader:URLLoader = URLLoader(event.target);
             trace("completeHandler: " + " for object " + objectName);// + loader.data);

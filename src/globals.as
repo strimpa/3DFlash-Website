@@ -45,5 +45,12 @@ package
 	        textformatCubeTitle.size = 40;
 	        textformatCubeTitle.underline = false;
 		}
+		
+		public static function stripString(string:String):String
+		{
+			if(string.charAt(string.length-1)==" ")
+				return string.substr(0, string.length - 1);
+			return string;
+		}
 	}
 }
