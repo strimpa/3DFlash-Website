@@ -43,6 +43,7 @@ package
 		public static var keywords:KeywordManager;
 		public static var curvedLines:CurvedLineManager;
 		public static var loader:LoaderDisplay;
+		public static var progress:ProgressTracker;
 
 		// controls
 		public var slider:MySlider;
@@ -68,6 +69,7 @@ package
 			//this.opaqueBackground = 0x000000;
 			//canvas.blendMode = BlendMode.HARDLIGHT;
 			//overlay.blendMode = BlendMode.ALPHA;
+			
 			globals.Init();
 			txtFieldMgr = new TitleFieldManager();
 			lastDragPos = new Point(0,0);
@@ -96,6 +98,8 @@ package
 
 			canvas = new ThreeDCanvas();
 			elements.addChild(canvas);
+			progress = new ProgressTracker();
+			elements.addChild(progress);
 			output("create bezier overlay");
 			CreateBezierOverlay();
 			output("create debug elements");
@@ -103,12 +107,11 @@ package
 
 			output("adding event listeners");
 			this.addEventListener(Event.ENTER_FRAME, draw);
-			rotButton.addEventListener(MouseEvent.MOUSE_UP, rotButtonClick);
 
 			output("creation finished, starting loading content"); 
 			content = new ContentManager();
 		}
-		
+
 		public static function InitCanvas(data:Object):void
 		{
 			output("loading finished, starting");
@@ -272,6 +275,8 @@ package
 			mouseIsOverBackground=true;
 			if(event.buttonDown && lastDragPos)
 				mouseDragHandler(event);
+			//if(ProgressTracker.getState()==ProgressTracker.SCOPE_SELECT)
+				//ProgressTracker.setState(ProgressTracker.START);
 		}
 		public function mouseOverHandler(event:MouseEvent):void
 		{
@@ -326,6 +331,7 @@ package
 			buttonShape.graphics.drawRect(0,0,50,20);
 			buttonShape.graphics.endFill();
 			rotButton = new SimpleButton(buttonShape,buttonShape,buttonShape,buttonShape);
+			rotButton.addEventListener(MouseEvent.MOUSE_UP, rotButtonClick);
 			addChild(rotButton);
 			rotButton.x = 10;
 			rotButton.y = 20;
@@ -379,7 +385,8 @@ package
 		
 		private function draw(event:Event):void
 		{
-			debugText.text = "fps:"+lastFrameCount;//slider.getValue();
+			if(debugText)
+				debugText.text = "fps:"+lastFrameCount;//slider.getValue();
 			
 			var currSecondVal:Number = new Date().getSeconds();
 			if(currSecondVal!=lastSecondVal)
@@ -406,6 +413,8 @@ package
 			
 			loader.Process();
 			loader.draw();
+			
+			progress.Process();
 		} 
 	}
 }
