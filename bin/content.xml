@@ -5,195 +5,195 @@
 		<category>programming</category>
 		<keywords>3D,3dsmax,programming</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>23:50</title>
-		<category>CG</category>
-		<keywords>3D,film,uni</keywords>
+		<category>3DArt</category>
+		<keywords>3D,film,design,uni,barcelona</keywords>
 		<description>1</description>
 		<url>html/2350/2350.html</url>
 	</content>
 	<content>
-		<title>three</title>
+		<title>Solechat</title>
+		<category>3DArt</category>
+		<keywords>3D,film,design,uni,barcelona</keywords>
+		<description>1</description>
+		<url>html/Solechat/index.html</url>
+	</content>
+	<content>
+		<title>Complicity</title>
+		<category>3DArt</category>
+		<keywords>3D,film,design,uni,barcelona</keywords>
+		<description>1</description>
+		<url>html/Complicity/index.html</url>
+	</content>
+	<content>
+		<title>Kummernuss</title>
+		<category>3DArt</category>
+		<keywords>3D,film,uni</keywords>
+		<description>1</description>
+		<url>html/Kummernuss/index.html</url>
+	</content>
+	<content>
+		<title>Los Buenos</title>
+		<category>3DArt</category>
+		<keywords>3D,film,design,uni,barcelona</keywords>
+		<description>1</description>
+		<url>html/LosBuenos/index.html</url>
+	</content>
+	<content>
+		<title>Mental Ray stuff</title>
+		<category>3DArt</category>
+		<keywords>3D</keywords>
+		<description>1</description>
+		<url>html/MentalRay/index.html</url>
+	</content>
+	<content>
+		<title>Cristina</title>
 		<category>web</category>
-		<keywords>3</keywords>
+		<keywords>web,design,programming</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/Cris/index.html</url>
 	</content>
 	<content>
-		<title>four</title>
-		<category>CG</category>
-		<keywords>1</keywords>
-		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
-	</content>
-	<content>
-		<title>five</title>
-		<category>CG</category>
-		<keywords>3</keywords>
-		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
-	</content>
-	<content>
-		<title>six</title>
+		<title>FH Luebeck</title>
 		<category>web</category>
-		<keywords>2</keywords>
+		<keywords>web,design</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/FHLuebeck/index.html</url>
 	</content>
 	<content>
-		<title>seven</title>
-		<category>CG</category>
-		<keywords>2</keywords>
-		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
-	</content>
-	<content>
-		<title>eight</title>
-		<category>analogue</category>
-		<keywords>4</keywords>
-		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
-	</content>
-	<content>
-		<title>nine</title>
-		<category>CG</category>
-		<keywords>3</keywords>
-		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
-	</content>
-	<content>
-		<title>ten</title>
-		<category>CG</category>
-		<keywords>4</keywords>
-		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
-	</content>
-	<content>
-		<title>eleven</title>
+		<title>Diplom Wiebke</title>
 		<category>web</category>
-		<keywords>4</keywords>
+		<keywords>web,design,programming</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/Wiebo/index.html</url>
 	</content>
 	<content>
-		<title>twelve</title>
-		<category>analogue</category>
-		<keywords>1</keywords>
-		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
-	</content>
-	<content>
-		<title>thirteen</title>
+		<title>Rock'n'Roll</title>
 		<category>web</category>
-		<keywords>1</keywords>
+		<keywords>web,design,programming</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/RocknRoll/index.html</url>
 	</content>
 	<content>
-		<title>fourteen</title>
-		<category>CG</category>
-		<keywords>3</keywords>
-		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
-	</content>
-	<content>
-		<title>fifteen</title>
-		<category>CG</category>
-		<keywords>3</keywords>
-		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
-	</content>
-	<content>
-		<title>sixteen</title>
+		<title>inema</title>
 		<category>web</category>
-		<keywords>4</keywords>
+		<keywords>web,design,programming</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/inema/index.html</url>
 	</content>
 	<content>
-		<title>seventeen</title>
-		<category>CG</category>
-		<keywords>2</keywords>
+		<title>Diplom</title>
+		<category>programming</category>
+		<keywords>design,programming,uni,games,leeds</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/Diplom/index.html</url>
 	</content>
 	<content>
-		<title>eighteen</title>
-		<category>analogue</category>
-		<keywords>2</keywords>
+		<title>Diplom Nina</title>
+		<category>programming</category>
+		<keywords>programming,uni</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/Nina/index.html</url>
 	</content>
 	<content>
-		<title>nineteen</title>
-		<category>analogue</category>
-		<keywords>4</keywords>
+		<title>Maxscripts</title>
+		<category>programming</category>
+		<keywords>programming,3D,games</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/Maxscripts/index.html</url>
 	</content>
 	<content>
-		<title>twenty</title>
-		<category>web</category>
-		<keywords>3</keywords>
+		<title>CampusMap</title>
+		<category>programming</category>
+		<keywords>programming,uni,3D,design,web,barcelona,games</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/CampousMap/index.html</url>
 	</content>
 	<content>
-		<title>twentyone</title>
-		<category>CG</category>
-		<keywords>2</keywords>
+		<title>Kicker</title>
+		<category>programming</category>
+		<keywords>programming,uni,3D,web,games</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/Kicker/index.html</url>
+	</content>
+	<content>
+		<title>Vice City Stories</title>
+		<category>3DArt</category>
+		<keywords>3D,games</keywords>
+		<description>1</description>
+		<url>html/ViceCity/index.html</url>
+	</content>
+	<content>
+		<title>Table Tennis</title>
+		<category>3DArt</category>
+		<keywords>3D,games,programming</keywords>
+		<description>1</description>
+		<url>html/TableTennis/index.html</url>
+	</content>
+	<content>
+		<title>GTA IV</title>
+		<category>3DArt</category>
+		<keywords>3D,games</keywords>
+		<description>1</description>
+		<url>html/GTAIV/index.html</url>
+	</content>
+	<content>
+		<title>China Town Wars</title>
+		<category>3DArt</category>
+		<keywords>3D,games,programming</keywords>
+		<description>1</description>
+		<url>html/CTW/index.html</url>
 	</content>
 	<content>
 		<title>twentytwo</title>
 		<category>web</category>
 		<keywords>1</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twentythree</title>
 		<category>web</category>
 		<keywords>2</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twentyfour</title>
-		<category>CG</category>
+		<category>3DArt</category>
 		<keywords>2</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twentyfive</title>
 		<category>web</category>
 		<keywords>3</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twentysix</title>
 		<category>web</category>
 		<keywords>4</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twetyseven</title>
 		<category>analogue</category>
 		<keywords>4</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twentyeight</title>
-		<category>CG	</category>
+		<category>3DArt</category>
 		<keywords>4</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/FancyChecker.html</url>
+		<url>html/FancyChecker/index.html</url>
 	</content>
 </root>
