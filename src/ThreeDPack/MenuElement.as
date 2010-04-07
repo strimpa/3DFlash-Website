@@ -13,8 +13,8 @@ package ThreeDPack
 		private var titleInvoked:Boolean = false;
 		private var myTitleSprite:Sprite = undefined;
 		private var lastFrameMouseState:Boolean = false;
-		public static const categoryLUT:Array = ["programming", "3DArt", "web", "analogue"];
-		public static const categoryStrings:Array = ["Programming", "3D Art", "Web/Flash", "Analogue"];
+		public static const categoryLUT:Array = ["misc", "programming", "3DArt", "web"];
+		public static const categoryStrings:Array = ["Miscellaneous", "Programming", "3D Art", "Web/Flash"];
 		
 		
 		public function MenuElement() {
@@ -43,6 +43,7 @@ package ThreeDPack
 		public override function mouseOverHandler(event:MouseEvent):void
 		{
 //			trace("mouse over "+category);
+			super.mouseOverHandler(event);
 			if (ProgressTracker.scopeType == ProgressTracker.KEYWORD_SCOPE || getState()!=COLLAPSED || !isActive())
 				return;
 
@@ -57,7 +58,6 @@ package ThreeDPack
 				myTitleSprite = TitleFieldManager.showTitleAtPoint(title, this, mp);
 			}
 			ProgressTracker.setState(ProgressTracker.SCOPE_SELECT);
-			super.mouseOverHandler(event);
 		}
 		public override function mouseOutHandler(event:MouseEvent):void
 		{

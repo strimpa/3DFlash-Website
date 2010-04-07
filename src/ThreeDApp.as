@@ -102,8 +102,8 @@ package
 			elements.addChild(progress);
 			output("create bezier overlay");
 			CreateBezierOverlay();
-			output("create debug elements");
-			CreateDebugElements();
+//			output("create debug elements");
+//			CreateDebugElements();
 
 			output("adding event listeners");
 			this.addEventListener(Event.ENTER_FRAME, draw);

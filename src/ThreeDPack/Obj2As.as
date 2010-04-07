@@ -147,12 +147,12 @@
 																	  	lines[lineIndex].length)
 							   					).split(" ");
 					
-						trace(values);
+//						trace(values);
 						// vert index/ UV/ normal
 						for(var infoSplitInd:Number=0;infoSplitInd<values.length;infoSplitInd++)
 						{
 							var info:Array = values[infoSplitInd].split("/");
-							trace(info);
+//							trace(info);
 							faces[infoSplitInd] = info[0];
 							if(info.length>1)
 								uVs[infoSplitInd] = info[1];
@@ -167,7 +167,7 @@
 						for(lowerInd=0;lowerInd<faces.length;lowerInd++)
 						{
 							faces[lowerInd] = new Number(newObject.points.length) + new Number(faces[lowerInd]); // relative numbers for
-							trace("vertIndex:"+faces[lowerInd]+", newObject.points[faces[lowerInd]]:"+newObject.points[faces[lowerInd]]);
+//							trace("vertIndex:"+faces[lowerInd]+", newObject.points[faces[lowerInd]]:"+newObject.points[faces[lowerInd]]);
 						}
 						for(lowerInd=0;lowerInd<newNormals.length;lowerInd++)
 						{

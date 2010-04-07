@@ -27,7 +27,7 @@
 		public function loadItem(item:String)
 		{
 			objectName = item;
-			load(new URLRequest("http://192.168.1.4/website/3DEngine/bin/"+item));//"http://www.gunnardroege.de/3DEngine/bin/"+item)); //http://localhost/website/3DEngine/bin
+			load(new URLRequest("http://127.0.0.1/website/3DEngine/bin/"+item));//"http://www.gunnardroege.de/3DEngine/bin/"+item)); //http://localhost/website/3DEngine/bin
 		    ThreeDApp.loader.registerLoadingItem(objectName);
 		}
 

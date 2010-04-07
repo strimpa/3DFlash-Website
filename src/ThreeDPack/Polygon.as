@@ -232,6 +232,9 @@
 			if (currColour!=parentObj.currColour || isDirty())
 				parentObj.setDirty();
 				
+			if (undefined != parent)
+				parentObj = parent;
+				
 			currColour = parentObj.currColour;
 		}
 		

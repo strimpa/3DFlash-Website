@@ -42,12 +42,19 @@
 			stateFields = new Array(stateStrings.length);
 			var b:Sprite =  new Sprite();
 			b.graphics.beginFill(0xFFFFFF, 1);
-//			b.graphics.lineStyle(
 			b.graphics.drawCircle(
 				statePosition.x + 8,
 				statePosition.y + 8,
 				8);
 			b.graphics.endFill();
+			b.graphics.lineStyle(2, 0x666666, 1, false, "normal", "none");
+
+			b.graphics.moveTo(statePosition.x+2, statePosition.y + 8);
+			b.graphics.lineTo(statePosition.x+16, statePosition.y + 8);
+			b.graphics.moveTo(statePosition.x+8, statePosition.y + 2);
+			b.graphics.lineTo(statePosition.x+2, statePosition.y + 8);
+			b.graphics.lineTo(statePosition.x+8, statePosition.y + 14);
+			
 			button = new SimpleButton(b,b,b,b);
 			button.addEventListener(MouseEvent.MOUSE_DOWN, backButtonPressHandler);
 			button.alpha = 0;

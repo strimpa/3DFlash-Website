@@ -117,6 +117,12 @@ package
 
         private function ioErrorHandler(event:IOErrorEvent):void {
             trace("ioErrorHandler: " + event + " for object " + objectName);
+            var content:Object = null;// event.target.content;
+            trace("completeHandler: " + content + objectName);
+			unload();
+			unRegisterQueueTuple(event.target as LoaderInfo);
+			callObj.onData(content);
+			objectName = "";
         }
 		
 		public function onData(src:String):void
