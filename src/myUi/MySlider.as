@@ -13,8 +13,8 @@ package myUi
 	 public class MySlider extends Sprite 
 	 {
 	 	// defines
-	 	const HORIZONTAL:Number=0,VERTICAL:Number=1;
-	 	const IDLE:Number=0, PRESSED:Number=1, MOVING:Number=2, RELEASED:Number=3; 
+	 	public const HORIZONTAL:Number=0,VERTICAL:Number=1;
+	 	public const IDLE:Number=0, PRESSED:Number=1, MOVING:Number=2, RELEASED:Number=3; 
 	 	
 	 	public var orientation:Number;
 	 	public var pos:Point;

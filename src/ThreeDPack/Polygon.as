@@ -10,6 +10,7 @@
 	import flash.geom.Matrix;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
+	import flash.events.Event;
 
 	public class Polygon extends DrawElement
 	{
@@ -28,6 +29,9 @@
 		private var textSprite:Sprite;
 		private var textField:TextField;
 		private var mCurves:Array;
+		
+		public var myCurrentLoaders:Array;
+		private var bubbleClickEvent:Boolean;
 		
 	// new point calculation
 	//	var points:Array;
@@ -68,6 +72,8 @@
 			this.addChild(textSprite);
 			mCurves = new Array();
 //			this.blendMode = BlendMode.SCREEN; TOOOOOOOOOOOO Costy
+
+			bubbleClickEvent = true;
 		}
 		
 		public function calcFaceNormal():void
@@ -75,21 +81,16 @@
 			if(!parentObj || parentObj.normals==undefined || parentObj.normals.length<=0 || normalIndices==undefined)
 				return;
 				
-//			trace(parentObj.name+", "+parentObj.normals.length);
-				
 			faceNormal = new ThreeDPoint(0,0,0);
 			for(var normalIndex:Number=0;normalIndex<normalIndices.length;normalIndex++)
 			{
 				if (undefined == parentObj.normals[normalIndices[normalIndex]])
 				{
-//					trace("normalIndex:"+normalIndex+", normalIndex:"+normalIndices[normalIndex]);
-					trace("normalIndex:"+normalIndex+", normalIndex:"+normalIndices[normalIndex]+", parentObj.normals[normalIndices[normalIndex]]:" + parentObj.normals[normalIndices[normalIndex]]);
 					continue;
 				}
 				faceNormal = faceNormal.plus(parentObj.normals[normalIndices[normalIndex]]);
 			}
 			faceNormal.divideMe(normalIndices.length);
-//			trace("faceNormal: "+faceNormal);
 		}
 		
 		public function calcDepth():void{
@@ -136,7 +137,7 @@
 			//trace("this.depth:"+this.depth);
 		}
 		
-		public override function mouseOverHandler(event:MouseEvent):void
+		public override function mouseOverHandler(event:Event):void
 		{
 			if(notMoveable())
 				return;
@@ -148,7 +149,7 @@
 			super.mouseOverHandler(event);
 		}
 	
-		public override function mouseOutHandler(event:MouseEvent):void
+		public override function mouseOutHandler(event:Event):void
 		{
 			if(notMoveable())
 				return;
@@ -160,19 +161,17 @@
 			super.mouseOutHandler(event);
 		}
 		
-		public override function mouseClickHandler(event:MouseEvent):void
+		public override function mouseClickHandler(event:Event):void
 		{
 			if(notMoveable())
 				return;
-			if(parentObj)
+			if(parentObj && bubbleClickEvent)
 				parentObj.mouseClickHandler(event);
-//			jump();
-//			for(var jumpIndex=0;jumpIndex<this.otherElementParts.length;jumpIndex++)
-//				this.otherElementParts[jumpIndex].jump();
-//			super.mouseClickHandler(event);
+				
+			bubbleClickEvent = true;
 		}
 
-		public override function mouseUpHandler(event:MouseEvent):void
+		public override function mouseUpHandler(event:Event):void
 		{
 			if(notMoveable())
 				return;
@@ -180,7 +179,7 @@
 				parentObj.mouseUpHandler(event);
 		}
 
-		public override function mouseMoveHandler(event:MouseEvent):void
+		public override function mouseMoveHandler(event:Event):void
 		{
 			if(notMoveable())
 				return;
@@ -190,7 +189,7 @@
 			mouseOverHandler(event);
 		} 
 
-		public override function MouseDragHandler(event:MouseEvent):void
+		public override function MouseDragHandler(event:Event):void
 		{
 			parentObj.MouseDragHandler(event);
 		} 
@@ -265,6 +264,7 @@
 		public override function OnCollapsing():void
 		{
 			super.OnCollapsing();
+			ThreeDApp.UnbindScrollbar();
 		}
 		
 		public override function OnExtending():void
@@ -274,11 +274,27 @@
 			super.OnExtending();
 		}
 		
+		public override function OnExtended():void
+		{
+			if (textField)
+			{
+				ThreeDApp.BindScrollbar(textField);
+			}
+		}
+		
 		//public override function OnExtended():void
 		//{
 			//ThreeDCanvas.showExitSprite(this.parentObj as Cube);
 		//}
 		//
+		
+		public function LinkHandler(event:TextEvent):void
+		{
+			bubbleClickEvent = false;
+			ProgressTracker.requestNewContent(event.text);
+			ThreeDCanvas.exitHandler(event);
+		}
+		
 		public function setText(text:String)
 		{
 			if(!textField)
@@ -287,17 +303,18 @@
 				try
 				{
 					textField = new TextField();
+					textField.addEventListener(TextEvent.LINK, LinkHandler);
 					textField.selectable = false;
 					textField.wordWrap = true;
 					textField.multiline = true;
 					textField.blendMode = BlendMode.LAYER;
-//					textSprite.addChild(Content.getBG());
 					textSprite.addChild(textField);
 					textField.styleSheet = Content.getStyle();
 					textField.htmlText = text;
 					var picLoader:TargetLoad = ContentManager.getLoader();
 					var picsFound:Boolean = false;
 					var pictureIds:Array = ["pic1", "pic2", "pic3", "pic4", "pic5", "pic6", "pic7", "pic8", "pic9"];
+					myCurrentLoaders = new Array();
 					for each(var picId in pictureIds)
 					{
 						var ref:DisplayObject = textField.getImageReference(picId);
@@ -308,15 +325,16 @@
 							picsFound = true;
 							var theLoader:Loader = (ref as Loader);
 							theLoader.name = picId;
-							picLoader.configureListeners(theLoader.contentLoaderInfo, picId, true);
+							myCurrentLoaders.push(theLoader);
+							picLoader.configureListeners(theLoader.contentLoaderInfo, picId, true, this);
 						}
 					}
-
 				}
 				catch (error:Error)
 				{
 					trace(error.getStackTrace());
 				}
+
 				CurvedLineManager.setFilling(false);
 				CurvedLineManager.setRadius(100);
 				CurvedLineManager.createCurve(
@@ -325,16 +343,15 @@
 					new Point(-150, 100),
 					new Point(400, 0), 
 					textSprite);
-				//mCurves.push(CurvedLineManager.createCurve(
-					//new Point(0+500, 0), 
-					//new Point(0+20, 0),
-					//new Point(0, 0+20),
-					//new Point(0, 0+50),
-					//textSprite));
 				CurvedLineManager.setFilling(true);
 				CurvedLineManager.setRadius(50);
 			}
 		}
+		
+		public function OnLoaded():void
+		{
+		}
+		
 		public function setHeader(header:String):void
 		{
 			if(titleField && contains(titleField))
@@ -410,9 +427,9 @@
 				}
 				//trace("vertIndex:"+vertIndex+", currPoint:"+currPoint.x+", "+currPoint.y);
 				if(renderTheEdge)
-					graphics.lineStyle(2, parentObj.borderColour, parentObj.currAlpha);
+					graphics.lineStyle(0.5, parentObj.borderColour, parentObj.currAlpha);
 				else
-					graphics.lineStyle(1, parentObj.borderColour, 0);
+					graphics.lineStyle(0.5, parentObj.borderColour, 0);
 				graphics.lineTo(currPoint.x, currPoint.y);
 				
 				minPoint.x = currPoint.x < minPoint.x ? currPoint.x : minPoint.x;

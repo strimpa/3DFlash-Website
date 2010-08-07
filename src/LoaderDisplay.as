@@ -61,7 +61,7 @@
 		public function updateProgress(name:String, progress:Number):void
 		{
 			var index:uint = loadingItems.indexOf(name);
-			trace("updateProgress: "+progress);
+			//trace("updateProgress: "+progress);
 			loadingProgresses[index] = progress;
 		}
 

@@ -54,7 +54,6 @@ package ThreeDPack
 			}
 			if(this.numChildren==0 && contentSprite!=undefined)
 			{
-				trace("ThreeDSprite adding content Sprite");
 				addChildAt(contentSprite, 0);
 			}
 //			if(renderPoints[1]!=undefined && renderPoints[0]!=undefined)

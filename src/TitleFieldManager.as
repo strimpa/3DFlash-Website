@@ -17,10 +17,10 @@ package
 
 	public class TitleFieldManager 
 	{
-		static var inited:Boolean=false;
-		static var mTitleTextFields:Array;
-		static var mFieldFading:Array;
-		static var mCubes:Array;
+		public static var inited:Boolean=false;
+		public static var mTitleTextFields:Array;
+		public static var mFieldFading:Array;
+		public static var mCubes:Array;
 		
 		function TitleFieldManager()
 		{
@@ -34,11 +34,11 @@ package
 			for(var tf:int = 0;tf<mTitleTextFields.length;tf++)
 			{
 				mTitleTextFields[tf] = new Sprite();
-				var field = new TextField();
+				var field:TextField = new TextField();
 				field.name = "textfield";
 				field.defaultTextFormat = globals.textformatMenuTitle;
 				field.selectable = false;
-				field.autoSize = TextFieldAutoSize.LEFT;
+				field.autoSize = TextFieldAutoSize.RIGHT;
 				field.embedFonts = true;
 				mTitleTextFields[tf].alpha = 0;
 				mTitleTextFields[tf].x = 0;
@@ -57,17 +57,17 @@ package
 
 			var one:ThreeDPoint,two:ThreeDPoint;
 			one = pos;
-			two = pos.plus(new ThreeDPoint(100+Math.random()*100,100+Math.random()*100));
+			two = new ThreeDPoint(600, 170); //pos.plus((100+Math.random()*100,100+Math.random()*100));
 			var one2d:Point = new Point(one.x,one.y);
 			var two2d:Point =  new Point(two.x,two.y);
-			var dist = two2d.subtract(one2d);
+			var dist:Point = two2d.subtract(one2d);
 	
 			var inactive:Sprite;
-			var index = 0;
-			for each(var tf:Sprite in mTitleTextFields)
+			var index:Number = 0;
+			for each(var tf2:Sprite in mTitleTextFields)
 			{
-				inactive = tf;
-				if(tf.alpha<=0)
+				inactive = tf2;
+				if(tf2.alpha<=0)
 					break;
 				index++;
 			}
@@ -80,7 +80,6 @@ package
 			}
 			ThreeDApp.overlaySprite.addChild(inactive);
 			var inactiveIndex:int = mTitleTextFields.indexOf(inactive);
-			trace("new textfield "+title+" at "+inactiveIndex);
 			mFieldFading[inactiveIndex] = false;
 			var theTextField:TextField =(inactive.getChildByName("textfield") as TextField); 
 			theTextField.text = title;

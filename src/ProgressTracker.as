@@ -5,11 +5,14 @@
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.text.TextField;
+	import ThreeDPack.Cube;
 	import ThreeDPack.CubeCollection;
 	import ThreeDPack.DrawElement;
 	import ThreeDPack.MenuElement;
 	import ThreeDPack.Obj2As;
 	import ThreeDPack.ThreeDCanvas;
+	import flash.events.Event;
+	import ThreeDPack.ThreeDObject;
 	
 	/**
 	 * ProgressTracker: A class tracking the progress from start till content selection and allowing navigation back and forth
@@ -29,6 +32,8 @@
 		public static var scopeType:int = -1;
 		private var activeCircle:Sprite;
 		public static var lastChosenKeyword:String;
+		private static var newContentRequested:String;
+		private static var scopeTypeToCarryOver:int;
 		
 		function ProgressTracker()
 		{
@@ -77,16 +82,81 @@
 				field.height = 20;
 				field.rotation = 0.3;
 			}
+			
+			newContentRequested = undefined;
+			scopeTypeToCarryOver = -1;
+		}
+		
+		public static function requestNewContent(contentTitle:String):void
+		{
+			newContentRequested = contentTitle;
+			scopeTypeToCarryOver = scopeType;
+			trace("saving scopetype:"+scopeTypeToCarryOver)
+		}
+		
+		public static function NewContentIsRequested():Boolean
+		{
+			return newContentRequested != undefined;
+		}
+		
+		public static function resetContent(lastCube:Cube=undefined, scriptCall:Boolean=false):void
+		{
+			if (undefined != newContentRequested)
+			{
+				ThreeDApp.output("newContentRequested");
+				var newContentCube:Cube = CubeCollection.findContentCube(newContentRequested);
+				if (undefined != newContentCube)
+				{
+					var cat = newContentCube.getContent().mCategory;
+					ThreeDApp.output("SelectAndExtend "+newContentCube.getContent().mTitle+", cat:"+cat);
+					CubeCollection.setCubesActiveByIndex(true); // all
+//					Obj2As.setObjectsActiveByCategory(-1); // none
+					newContentCube.SelectAndExtend(scriptCall);
+					newContentRequested = undefined;
+				}
+				scopeType = scopeTypeToCarryOver;
+				if (scopeType == -1)
+					scopeType = 0;
+				trace("using saved scopetype:"+scopeTypeToCarryOver)
+				scopeTypeToCarryOver = -1;
+			}
+			else
+			{
+				if (lastCube == undefined)
+				{
+					ThreeDApp.output("reset to start");
+					CubeCollection.setCubesActiveByCategory(true, "none");
+					Obj2As.setObjectsActiveByCategory(-1, false); // all
+				}
+				else
+				{
+					if (scopeType == ProgressTracker.CATEGORY_SCOPE)
+					{
+						ThreeDApp.output("category cat:"+lastCube.getContent().mCategory);
+						CubeCollection.setCubesActiveByCategory(true, lastCube.getContent().mCategory);
+						Obj2As.setObjectsActiveByCategory(MenuElement.getCategoryIndex(lastCube.getContent().mCategory));
+					}
+					else
+					{
+						ThreeDApp.output("category keyword");
+						CubeCollection.setCubesActiveByKeyword(true, ProgressTracker.lastChosenKeyword);
+					}
+				}
+			}
+			newContentRequested = undefined;
 		}
 		
 		public function backButtonPressHandler(e:MouseEvent):void
 		{
 			switch(state)
 			{
+				case 0:
+					KeywordManager.resetPositions();
+					break;
 				case 1:
 					break;
 				case 2:
-					CubeCollection.setCubeActive(true, -1);
+					CubeCollection.setCubesActiveByIndex(true, -1);
 					Obj2As.setObjectsActiveByCategory(-1, false); // all
 					for each(var obj:MenuElement in Obj2As.objects) 
 					{
@@ -105,10 +175,24 @@
 		public static function setState(theState:uint):void
 		{
 			newState = theState;
-			if (theState == START)
+			switch(theState)
 			{
-				scopeType = -1;
-				lastChosenKeyword = undefined;
+				case START:
+				{
+					scopeType = -1;
+					lastChosenKeyword = undefined;
+					ThreeDApp.SetBgImage(ContentManager.bg1);
+				}
+				break;
+				case SCOPE_SELECTED:
+				{
+					ThreeDApp.SetBgImage(ContentManager.bg2);
+				}
+				break;
+				case CONTENT_SELECTED:
+				{
+				}
+				break;
 			}
 		}
 		public static function getState():uint

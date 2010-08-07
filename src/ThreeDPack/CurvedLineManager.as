@@ -16,7 +16,7 @@ package ThreeDPack
 		static var drawCurveFlag:Boolean=true;
 		static var shiftFlag:Boolean=true;
 		static var drawCircleFlag:Boolean=true;
-		static var fillingFlag:Boolean = true;
+		static var fillingFlag:Boolean = false;
 		static var mRadius:Number = 50;
 		
 		// new

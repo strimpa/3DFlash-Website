@@ -34,7 +34,7 @@
 		
 		private var animating:Boolean=false;
 		public var animIndex:Number=0;
-		private const animDuration:Number = 5;
+		private const animDuration:Number = 15;
 		
 		public var myCanvas:Sprite;
 		
@@ -165,8 +165,8 @@
 			
 			if (CurvedLineManager.allPointsCurvedOld.length>0)
 			{
-				for each(var punkt:Point in CurvedLineManager.allPointsCurvedOld)
-					allPointsCurvedOld.push(punkt);
+				for each(var currpunkt:Point in CurvedLineManager.allPointsCurvedOld)
+					allPointsCurvedOld.push(currpunkt);
 			}
 			
 //			trace("numSections:"+numSections);
@@ -302,8 +302,7 @@
 			if(!CurvedLineManager.firstExecution)
 			{
 				animIndex = animDuration;
-				//trace("anim started.");//+animIndex+" allPointsCurvedOld 1:"+allPointsCurvedOld
-				trace("allPointsCurvedNew.length:"+allPointsCurvedNew.length+", allPointsCurvedOld.length:"+allPointsCurvedOld.length);
+				//trace("allPointsCurvedNew.length:"+allPointsCurvedNew.length+", allPointsCurvedOld.length:"+allPointsCurvedOld.length);
 			}
 			else
 			{
@@ -361,31 +360,35 @@
 		public function Process():void
 		{
 			var graphics:Graphics = myCanvas.graphics;
-			if(animIndex>0)
+			if(animIndex>=0)
 			{
-				allPointsCurvedCurr = new Array(allPointsCurvedNew.length);
+				var currAnimLimit:int = allPointsCurvedNew.length * (1.0 - (animIndex / animDuration));
+				allPointsCurvedCurr = new Array(currAnimLimit);
 				var pointIndex:Number=0; 
-//				trace("allPointsCurvedNew:"+allPointsCurvedNew);
-//				trace("allPointsCurvedOld:"+allPointsCurvedOld);
+				//trace("allPointsCurvedCurr:"+allPointsCurvedCurr.length);
+				//trace("allPointsCurvedNew:" + allPointsCurvedNew.length);
 				if(allPointsCurvedNew.length==0||allPointsCurvedOld.length==0)
 				{
-					trace("allPointsCurvedNew.length==0||allPointsCurvedOld.length==0");
+					//trace("allPointsCurvedNew.length==0||allPointsCurvedOld.length==0");
 					allPointsCurvedCurr = allPointsCurvedNew;
+					animIndex--;
 					return;
 				}
-				for each(var punkt:Point in allPointsCurvedNew)
+				for each(var currpunkt:Point in allPointsCurvedNew)
 				{
-					allPointsCurvedCurr[pointIndex] = Point.interpolate(allPointsCurvedOld[pointIndex], punkt, animIndex/animDuration);
+					allPointsCurvedCurr[pointIndex] = Point.interpolate(allPointsCurvedOld[pointIndex], currpunkt, 0);// animIndex / animDuration);
 					pointIndex++;
+					if (pointIndex > currAnimLimit)
+						break;
 				}
 				graphics.clear();
 //				trace("animIndex:"+animIndex);
-				animIndex--;
 			}
 			else
 			{
 				allPointsCurvedCurr = allPointsCurvedNew;
 			}
+			animIndex--;
 			
 			if(myCanvas==undefined)
 				return;
@@ -439,7 +442,7 @@
 			var colorSwop:Boolean=true;
 
 	
-			if(fillingFlag)graphics.beginFill(CurvedLineManager.colour, 50);
+			//if(fillingFlag)graphics.beginFill(CurvedLineManager.colour, 50);
 			graphics.moveTo(allPointsCurvedCurr[0].x, allPointsCurvedCurr[0].y);
 			for(var k:uint=1;k<allPointsCurvedCurr.length;k++){
 				graphics.lineTo(allPointsCurvedCurr[k].x, allPointsCurvedCurr[k].y);
@@ -469,7 +472,7 @@
 			}
 			if (fillingFlag) graphics.endFill();
 			
-			if (animIndex <= 0 )
+			if (animIndex < 0 )
 				deleteMe();
 
 		} // draw function

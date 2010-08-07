@@ -27,7 +27,7 @@
 		public function loadItem(item:String)
 		{
 			objectName = item;
-			load(new URLRequest("http://127.0.0.1/website/3DEngine/bin/"+item));//"http://www.gunnardroege.de/3DEngine/bin/"+item)); //http://localhost/website/3DEngine/bin
+			load(new URLRequest("http://www.gunnardroege.de/3DEngine/bin/"+item));//"http://www.gunnardroege.de/3DEngine/bin/"+item)); //http://localhost/website/3DEngine/bin
 		    ThreeDApp.loader.registerLoadingItem(objectName);
 		}
 
@@ -44,33 +44,32 @@
 		{
 			ThreeDApp.loader.unRegisterLoadingItem(objectName);
             var loader:URLLoader = URLLoader(event.target);
-            trace("completeHandler: " + " for object " + objectName);// + loader.data);
+//            trace("completeHandler: " + " for object " + objectName);// + loader.data);
 			var theString:String = loader.data as String;
-			trace("check for other loaders inside data.");
 			checkTextField.htmlText = theString;
 			objectName = "";
 			callObj.onData(theString);
 		}
 
         private function openHandler(event:Event):void {
-           trace("openHandler: " + event + " for object " + objectName);
+//           trace("openHandler: " + event + " for object " + objectName);
         }
 
         private function progressHandler(event:ProgressEvent):void {
 			ThreeDApp.loader.updateProgress(objectName, event.bytesLoaded/event.bytesTotal);
-            trace("progressHandler loaded:" + event.bytesLoaded + " total: " + event.bytesTotal + " for object " + objectName);
+//            trace("progressHandler loaded:" + event.bytesLoaded + " total: " + event.bytesTotal + " for object " + objectName);
         }
 
         private function securityErrorHandler(event:SecurityErrorEvent):void {
-            trace("securityErrorHandler: " + event + " for object " + objectName);
+//            trace("securityErrorHandler: " + event + " for object " + objectName);
         }
 
         private function httpStatusHandler(event:HTTPStatusEvent):void {
-            trace("httpStatusHandler: " + event + " for object " + objectName);
+//            trace("httpStatusHandler: " + event + " for object " + objectName);
         }
 
         private function ioErrorHandler(event:IOErrorEvent):void {
-            trace("ioErrorHandler: " + event + " for object " + objectName);
+//            trace("ioErrorHandler: " + event + " for object " + objectName);
 			event.stopPropagation();
         }
 		

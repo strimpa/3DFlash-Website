@@ -6,6 +6,7 @@
 	import flash.geom.Point;
 	import flash.text.*;
 	import flash.events.MouseEvent;
+	import flash.events.Event;
 
 	public class Cube extends ThreeDObject
 	{
@@ -148,20 +149,17 @@
 			mouseRotMode = true;
 		}
 		
-		public override function mouseClickHandler(event:MouseEvent):void
+		public override function mouseClickHandler(event:Event):void
 		{
-			ProgressTracker.setState(ProgressTracker.CONTENT_SELECTED);
-			if(ThreeDCanvas.currActiveCube==undefined)
-				ThreeDCanvas.setActiveCube(this);
 			if (getState() == EXTENDED)
 			{
 				collapsePolygons(COLLAPSED, startRotationMode);
 			}
 		}
 		
-		public override function mouseUpHandler(event:MouseEvent):void 
+		public override function mouseUpHandler(event:Event):void 
 		{
-			if(getState()==EXTENDED)// (mouseRotMode)
+			if(getState()==EXTENDED && mouseRotMode)// (mouseRotMode)
 			{
 				mouseRotMode = false;
 				extendPolygons();
@@ -171,13 +169,31 @@
 			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this!=ThreeDCanvas.currActiveCube))
 				return;
 
-			ThreeDApp.output("Content clicked:"+myContent.mTitle);
-			TitleFieldManager.fadeOutTitle(myTitleSprite);
-			jump();
+			SelectAndExtend();
 			super.mouseUpHandler(event);
 		}
 		
-		public override function mouseOverHandler(event:MouseEvent):void
+		public function SelectAndExtend(scriptCall:Boolean=false):void
+		{
+			//if (isMoving())
+			//{
+				//ThreeDApp.output("Cancellling SelectAndExtend, already moving.");
+				//return;
+			//}
+			if (ThreeDCanvas.currActiveCube != undefined && ThreeDCanvas.currActiveCube.getState()!=COLLAPSED)
+				ThreeDCanvas.currActiveCube.jump();
+				
+			ThreeDCanvas.setActiveCube(this);
+			// DOn't call javascript if this comes from there anyway
+			if(!scriptCall)
+				ThreeDApp.contentSelected(myContent.mTitle);
+			TitleFieldManager.fadeOutTitle(myTitleSprite);
+			if(getState()!=EXTENDED)
+				jump();
+			ProgressTracker.setState(ProgressTracker.CONTENT_SELECTED);
+		}
+		
+		public override function mouseOverHandler(event:Event):void
 		{
 			mouseIsOverMe = true;
 //			super.mouseOverHandler(event);
@@ -192,7 +208,7 @@
 				
 			var invWVMatrix:ThreeDMatrix = ThreeDCanvas.GetWorldViewMatrix().Inverse();
 			invWVMatrix.rotate( 180, 0, 0);
-			var distance = new ThreeDPoint(event.stageX, event.stageY,0).minus(position);
+			var distance = new ThreeDPoint(mouseX, mouseY,0).minus(position);
 			var swizzleDistance = new ThreeDPoint(distance.y, distance.x, 0);
 			var localAxisVec:ThreeDPoint = swizzleDistance.mul(invWVMatrix);//(Math.random(),Math.random(),Math.random());
 			localAxisVec.normalize();
@@ -202,20 +218,20 @@
 			super.mouseOverHandler(event);
 
 			ThreeDApp.SetMouseOverCube(myContent.mTitle);
-			ThreeDApp.keywords.Update(new Point(event.stageX, event.stageY), myContent.mKeywords);
+			ThreeDApp.keywords.Update(new Point(mouseX, mouseY), myContent.mKeywords);
 			
 		}
 		
-		public override function mouseMoveHandler(event:MouseEvent):void
+		public override function mouseMoveHandler(event:Event):void
 		{
 			mouseIsOverMe = true;
 			if (mouseRotMode)
 			{
-				var dragDelta:Point = new Point(event.stageY, event.stageX).subtract(lastDragPos);
+				var dragDelta:Point = new Point(mouseY, mouseX).subtract(lastDragPos);
 				currCubeRot -= dragDelta.y;
 //				trace("currCubeRot:"+currCubeRot);
 			}
-			lastDragPos = new Point(event.stageY, event.stageX);
+			lastDragPos = new Point(mouseY, mouseX);
 
 			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this!=ThreeDCanvas.currActiveCube))
 				return;
@@ -228,7 +244,7 @@
 			super.mouseMoveHandler(event);
 		}
 		
-		public override function mouseOutHandler(event:MouseEvent):void
+		public override function mouseOutHandler(event:Event):void
 		{
 			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this!=ThreeDCanvas.currActiveCube))
 				return;
@@ -342,11 +358,12 @@
 		public override function OnExtending():void
 		{
 			ThreeDCanvas.rotFlag = false;
-			CubeCollection.setCubeActive(true, collectionIndex);
+			CubeCollection.setCubesActiveByIndex(true, collectionIndex);
 			ThreeDCanvas.setActiveCube(this);
 //			setMask(undefined);
 			CurvedLineManager.doReset();
 			CurvedLineManager.setGuide(true);
+			ProgressTracker.setState(ProgressTracker.CONTENT_SELECTED);
 		}
 
 		public override function OnExtended():void
@@ -355,6 +372,7 @@
 			this.myContent.load();
 //			polygons[0].setCallback(EXTENDED, this.showContent);
 			super.OnExtended();
+			ProgressTracker.setState(ProgressTracker.CONTENT_SELECTED);
 		}
 		
 		public override function OnCollapsing():void
@@ -374,12 +392,13 @@
 			}
 			super.OnCollapsing();
 		}
+		
 		public override function OnCollapsed():void
 		{
-			if(ProgressTracker.scopeType==ProgressTracker.CATEGORY_SCOPE)
-				CubeCollection.setCubesActiveByCategory(true, myContent.mCategory);
-			else
-				CubeCollection.setCubesActiveByKeyword(true, ProgressTracker.lastChosenKeyword);
+			if (ThreeDCanvas.isCurrCubeMoving() || ThreeDCanvas.isCurrCubeExtended() || ProgressTracker.getState() == ProgressTracker.CONTENT_SELECTED)
+				return;
+			ThreeDApp.output("Cube::OnCollapsed()"+myContent.mTitle);
+			ProgressTracker.resetContent(this);
 			super.OnCollapsed();
 		}
 

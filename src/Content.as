@@ -5,12 +5,13 @@ package {
 	import ThreeDPack.Cube;
 	import flash.text.StyleSheet;
 	import ContentManager;
+	import ScrollBar;
 
 	/**
 	 * @author Gunnar
 	 */
 	 
-	public class Content extends TextField
+	public class Content
 	{
 		public var mTitle:String;
 		public var mCategory:String;
@@ -78,7 +79,6 @@ package {
 		
 		public function setText(index:uint):void
 		{
-//			trace("set text to "+index);
 			if(mTexts[index])
 				mMyCube.setText(mTexts[index], index);
 			if(mHeaders[index])

@@ -2,6 +2,7 @@
 {
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.events.Event;
 	import flash.geom.Point;
 
 	public class ThreeDObject extends DrawElement
@@ -52,7 +53,7 @@
 			this.myMatrixStack = new Array(new ThreeDMatrix());
 			this.depth=0;
 			currColour = 0x333333;
-			this.borderColour = 0x3D3F3D;
+			this.borderColour = 0x4D4F4D;// 0x3D3F3D;
 			this.position = new ThreeDPoint(0,0,0);
 			this.active = true;
 			currAlpha = 0;
@@ -121,7 +122,6 @@
 		
 		public override function OnCollapsed():void
 		{
-			KeywordManager.resetPositions();
 			super.OnCollapsed();
 			currActiveObject = -1;
 		}
@@ -232,7 +232,6 @@
 		 */
 		public function calcEdgeSmoothFlags():void
 		{
-			trace("calcEdgeSmoothFlags() Beginn");
 			edgeSmoothing = new Array();
 			var outerPolyIndex:Number;
 			var innerPolyIndex:Number;
@@ -278,7 +277,6 @@
 						}
 					}
 				}
-			trace("calcEdgeSmoothFlags() End");
 		} 
 		
 		public function renderEdge(firstPoint:Number, secondPoint:Number):Boolean
@@ -303,7 +301,6 @@
 
 		public function calcMoveVecs():void
 		{
-			trace("polygons.length:"+polygons.length);
 			for(var moveIndPoly:Number=0;moveIndPoly<polygons.length;moveIndPoly++)
 			{
 				if(!normalsCalculated)
@@ -319,10 +316,9 @@
 					polygons[moveIndPoly].calcFaceNormal();
 			}
 			normalsCalculated = true;
-			//trace("moveVecs"+this.moveVecs.length);
 		}
 
-		public override function mouseOverHandler(event:MouseEvent):void
+		public override function mouseOverHandler(event:Event):void
 		{
 			if(!isMovable)
 				return;
@@ -334,7 +330,7 @@
 			super.mouseOverHandler(event);
 		}
 	
-		public override function mouseOutHandler(event:MouseEvent):void
+		public override function mouseOutHandler(event:Event):void
 		{
 			if(!isMovable)
 				return;
@@ -345,11 +341,10 @@
 			super.mouseOutHandler(event);
 		}
 		
-		public override function mouseClickHandler(event:MouseEvent):void
+		public override function mouseClickHandler(event:Event):void
 		{
 			if(!isMovable)
 				return;
-			trace("currActiveObject:"+currActiveObject);
 			if (currActiveObject==origObjInd || -1==currActiveObject)
 			{
 				jump();
@@ -357,8 +352,13 @@
 			}
 		}
 
-		public override function MouseDragHandler(event:MouseEvent):void
+		public override function MouseDragHandler(event:Event):void
 		{
+		}
+		
+		public override function isMoving():Boolean
+		{
+			return super.isMoving() || (polygons && polygons[0] && polygons[0].isMoving());
 		}
 		
 		public function isDirty():Boolean
@@ -461,7 +461,6 @@
 			for(var polyIndex:Number=0; polyIndex<polygons.length; polyIndex++)
 			{
 				var currFace:Polygon = polygons[polyIndex];
-				trace("currFace.depth:"+currFace.depth1);
 			}
 		}
 		

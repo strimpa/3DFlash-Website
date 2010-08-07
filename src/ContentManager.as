@@ -15,6 +15,7 @@ package
 		const LOADING:uint = 0, IDLE:uint = 1;
 		public static const xml:uint = 0, swf:uint = 1, sceneData:uint = 2, css:uint = 3;
 		public static const target:uint = 0, type:uint = 1, storage:uint = 2, callback:uint = 3;
+		public static const bg1:String = "bg.jpg", bg2:String = "Sky01.jpg";
 		var state:uint = IDLE;
 		static var loadVars:TargetLoadVars;
 		static var loadSwf:TargetLoad;
@@ -29,7 +30,7 @@ package
 			loadVars = new TargetLoadVars(this);
 			loadSwf = new TargetLoad(this);
 			LoadObject("FontLoad.swf", swf, undefined, fontInit);
-			LoadObject("bg.jpg", swf, undefined, ThreeDApp.addToBackground);
+			LoadObject("bg.jpg", swf, undefined, ThreeDApp.setBackground);
 			LoadObject("baloo.swf", swf, undefined, ThreeDApp.addToBackground);
 			LoadObject("content.xml", xml, contentXML, ThreeDApp.InitCanvas);
 			LoadObject("sphere.obj", sceneData, undefined, ThreeDPack.Obj2As.onData);
@@ -61,7 +62,6 @@ package
 		
 		public function onData(data:Object):void
 		{
-			trace("onData");
 			if (data != undefined) 
 			{
 				var item:Object = queue[0];
@@ -85,7 +85,12 @@ package
 			} else {
 				trace("error! Unable to load external file. ");
 			}
+			
+			// delete current item off queue
 			queue.splice(0, 1);
+			if (queue.length <= 0)
+				currentLoadingQueueFinished();
+
 			state = IDLE;
 			Process();
 			//trace("that");
@@ -98,12 +103,11 @@ package
 				for(var x:uint=0; x<fonts.length;x++)
 				{
 				    font = fonts[x];
-				    trace("name : "+font.fontName);
-				    trace("style : "+font.fontStyle);
-				    trace("type : "+font.fontType);
+				    //trace("name : "+font.fontName);
+				    //trace("style : "+font.fontStyle);
+				    //trace("type : "+font.fontType);
 				
 				}		
-				trace("loaded");
 				ThreeDApp.InitGlobals();
 				ThreeDApp.loader.initTitle();
 		}
@@ -116,19 +120,23 @@ package
 			content.mTitle = xmlitem.title;
 			content.mCategory = xmlitem.category;
 			var keywordString:String = xmlitem.keywords;
-			trace("content.mKeywords:"+keywordString);
 			content.mKeywords = keywordString.split(",");//
 			content.mContentUrl = xmlitem.url;
 			return content;
 		}
 		
+		private function currentLoadingQueueFinished():void
+		{
+			ThreeDApp.loadCallback();
+		}
+		
 		private function loadNextItem():void
 		{
-			trace("loadNextItem");
 			var item:Object = queue[0];
-			if(item == undefined)
+			if (item == undefined)
+			{
 				return;
-			trace(item);
+			}
 			if(item[type] == xml || item[type] == sceneData || item[type] == css)
 				loadVars.loadItem(item[target]);
 			else

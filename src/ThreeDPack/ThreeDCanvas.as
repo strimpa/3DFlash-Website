@@ -134,13 +134,27 @@
 			currActiveCube = cube;
 		}
 		
+		public static function isCurrCubeMoving():Boolean
+		{
+			if (undefined != currActiveCube && currActiveCube.isMoving())
+				return true;
+			return false;
+		}
+		public static function isCurrCubeExtended():Boolean
+		{
+			if (undefined != currActiveCube && DrawElement.EXTENDED==currActiveCube.getState())
+				return true;
+			return false;
+		}
+		
 		public static function exitHandler(event:Event)
 		{
-			trace("currActiveCube:" + currActiveCube);
-			if(currActiveCube)
-				currActiveCube.jump();
-			currActiveCube = undefined;
 			ProgressTracker.setState(ProgressTracker.SCOPE_SELECTED);
+			if (currActiveCube)
+			{
+				currActiveCube.jump();
+			}
+			currActiveCube = undefined;
 		}
 		
 		static public function appendToObjects(item:ThreeDObject):void
@@ -180,7 +194,6 @@
 		
 		public function load():void
 		{
-			trace("load!");
 			allObjects = new Array(0);
 			drawList = new Array(0);
 			reloadDrawList = true;

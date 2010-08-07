@@ -10,25 +10,25 @@
 	 */
 	public class ThreeDMatrix
 	{
-		var a:Number;
-		var b:Number;
-		var c:Number;
-		var d:Number;
-		var e:Number;
-		var f:Number;
-		var g:Number;
-		var h:Number;
-		var i:Number;
-		var j:Number;
-		var k:Number;
-		var l:Number;
-		var tx:Number;
-		var ty:Number;
-		var tz:Number;
-		var m:Number;
+		public var a:Number;
+		public var b:Number;
+		public var c:Number;
+		public var d:Number;
+		public var e:Number;
+		public var f:Number;
+		public var g:Number;
+		public var h:Number;
+		public var i:Number;
+		public var j:Number;
+		public var k:Number;
+		public var l:Number;
+		public var tx:Number;
+		public var ty:Number;
+		public var tz:Number;
+		public var m:Number;
 		
-		var name:String;
-		var isProjState:Boolean = false;
+		public var name:String;
+		public var isProjState:Boolean = false;
 		
 		public function ThreeDMatrix(name:String="default name")
 		{
@@ -95,7 +95,7 @@
 			this.m == 1;
 		}
 		
-		public function ScaleValues(by:Number, ignorePos:Boolean=false)
+		public function ScaleValues(by:Number, ignorePos:Boolean=false):void
 		{
 			// Identity Matrix
 			this.a = 1+(this.a-1)*by;
@@ -139,7 +139,7 @@
 			if(0.01>Math.abs(this.m-1))this.m = 1;
 		}
 		
-		static function tweenValues(from:ThreeDMatrix, to:ThreeDMatrix, by:Number):ThreeDMatrix
+		public static function tweenValues(from:ThreeDMatrix, to:ThreeDMatrix, by:Number):ThreeDMatrix
 		{
 			var back:ThreeDMatrix = new ThreeDMatrix();
 			back.a = from.a+(to.a-from.a)*by;
@@ -388,16 +388,16 @@
 			return currPointState;
 		}
 	
-		function MakeAxisRotationMatrix(axis:ThreeDPoint, angle:Number)
+		public function MakeAxisRotationMatrix(axis:ThreeDPoint, angle:Number):void
 		{
-			var x = axis.x;
-			var y = axis.y;
-			var z = axis.z;
-			var x2 = x*x;
-			var y2 = y*y;
-			var z2 = z*z;
-			var sinOmega = Math.sin(angle);
-			var cosOmega = Math.cos(angle);
+			var x:Number = axis.x;
+			var y:Number = axis.y;
+			var z:Number = axis.z;
+			var x2:Number = x*x;
+			var y2:Number = y*y;
+			var z2:Number = z*z;
+			var sinOmega:Number = Math.sin(angle);
+			var cosOmega:Number = Math.cos(angle);
 
 			this.a = x2+(y2+z2)*cosOmega;
 			this.b = x*y*(1-cosOmega)-z*sinOmega;
@@ -479,8 +479,8 @@
 		public function Inverse():ThreeDMatrix
 		{
 			// Determinante version
-			var back = Adjunkte(); 
-			var determinante = Determinante(); 
+			var back:ThreeDMatrix = Adjunkte(); 
+			var determinante:Number = Determinante(); 
 //			back.traceMe();
 //			trace("determinante:"+determinante);
 			back.Divide(determinante);
@@ -488,7 +488,7 @@
 		}
 		public function Determinante():Number
 		{
-			var val = 
+			var val:Number = 
 				this.a * Determinant2x2(new Array(e,f,h,i)) -
 				this.b * Determinant2x2(new Array(d,f,g,i)) +
 				this.c * Determinant2x2(new Array(d,e,g,h));
@@ -511,7 +511,7 @@
 			return ret;
 		}
 		
-		public function traceMe(msg=""):void{
+		public function traceMe(msg:String=""):void{
 			trace(msg+": \n"+a+", "+b+", "+c+", "+tx+", \n"+d+", "+e+", "+f+", "+ty+", \n"+g+", "+h+", "+i+", "+tz+", \n"+j+", "+k+", "+l+", "+m);
 		}
 	}

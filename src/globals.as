@@ -19,7 +19,7 @@ package
 		{
 			textformatSmall = new TextFormat();
 	        textformatSmall.font = "Verdana";
-	        textformatSmall.color = 0x3D3F3D;
+	        textformatSmall.color = 0x1D1F1D;
 	        textformatSmall.size = 8;
 	        textformatSmall.underline = false;
 			
@@ -32,7 +32,6 @@ package
 		public static function InitStreamFont()
 		{
 			var edFont:Font = ContentManager.fonts[0];
-			trace("edFont: "+edFont.fontName);
 			textformatMenuTitle = new TextFormat();
 	        textformatMenuTitle.font = edFont.fontName;//"Edwardian Script ITC";//
 	        textformatMenuTitle.color = 0x888888;

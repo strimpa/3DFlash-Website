@@ -54,7 +54,6 @@ package
 			for (var i:uint = 0; i < menuMovie.numChildren; i++ )
 			{
 				var rand:Number = Math.random();
-				trace(rand);
 				var buttonSprite:Sprite = new Sprite();
 				buttonSprite.graphics.beginFill(0x888888, 0.5);
 				buttonSprite.graphics.lineStyle(0.5, 0xFFFFFF, 0);

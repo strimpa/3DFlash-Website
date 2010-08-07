@@ -12,11 +12,11 @@
 		static var lorem_lv:TargetLoadVars;
 		static var my_txt:String;
 		public static var objects:Array;
+		private static var currentActiveObj:MenuElement;
 	
 		public function Obj2As(filePath:String):void
 		{
 			//name="Obj2As";
-			trace("Obj2As Konstruktor with param: "+filePath);
 			filePath = filePath;
 			lorem_lv = new TargetLoadVars(this);
 			lorem_lv.loadItem(filePath);
@@ -27,7 +27,6 @@
 			if (data != undefined) {
 				my_txt = data;
 				parseObjString();
-				trace("loaded");
 			} else {
 				my_txt = "Unable to load external file.";
 				trace("error!!");
@@ -37,7 +36,6 @@
 		
 		static private function endObject(obj:MenuElement, normalsCalculated:Boolean, smoothingGroupsPresent:Boolean, category:uint):void
 		{
-			trace("ended Object:" + obj.name);
 			objects.push(obj);
 			obj.category = category;
 			obj.calcDepth();
@@ -55,13 +53,43 @@
 
 		public static function setObjectsActiveByCategory(cat:int, act:Boolean=true)
 		{
+			var oldActiveObject:MenuElement = currentActiveObj;
+			var newActiveObject:MenuElement = undefined;
+			currentActiveObj = undefined;
 			for each(var anObject:MenuElement in objects)
 			{
-				if(anObject.category==cat)
+				if (anObject.category == cat)
+				{
 					anObject.setActive(act);
+					currentActiveObj = anObject;
+				}
 				else
+				{
 					anObject.setActive(!act);
+				}
 			}
+			if (oldActiveObject != currentActiveObj)
+			{
+				if (oldActiveObject && oldActiveObject.getState() == DrawElement.EXTENDED)
+				{
+					ThreeDApp.output("oldActiveObject.jump();"+oldActiveObject.category);
+					oldActiveObject.jump();
+				}
+				if (currentActiveObj && currentActiveObj.getState() == DrawElement.COLLAPSED)
+				{
+					ThreeDApp.output("currentActiveObj.jump();"+currentActiveObj.category);
+					currentActiveObj.jump();
+				}
+			}
+		}
+		
+		public static function GetCurrentActiveObject():ThreeDObject
+		{
+			return currentActiveObj;
+		}
+		public static function ObjectIsActive():Boolean
+		{
+			return undefined!=currentActiveObj;
 		}
 		
 		static private function parseObjString():void

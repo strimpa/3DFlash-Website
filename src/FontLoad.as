@@ -14,7 +14,6 @@ package
 		function FontLoad()
 		{
 			Font.registerFont(EdFont);//registers font
-			trace("Font loaded!");
 		}
 	}
 }

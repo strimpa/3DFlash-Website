@@ -10,9 +10,8 @@ package
 	import flash.filters.BlurFilter;
 	import flash.geom.Rectangle;
 	import flash.text.*;
-	import flash.utils.Timer;
 	import ThreeDPack.*;
-	import flash.system.Security;
+    import flash.system.Security;
 
 	/**
 	 * @author gunnar
@@ -38,12 +37,14 @@ package
 		public var styleString:String = "	color:#3D3F3D;";
 
 		public static var content:ContentManager;
-		static var txtFieldMgr:TitleFieldManager;
+		public static var txtFieldMgr:TitleFieldManager;
 		
 		public static var keywords:KeywordManager;
 		public static var curvedLines:CurvedLineManager;
 		public static var loader:LoaderDisplay;
 		public static var progress:ProgressTracker;
+		public static var scrollbar:ScrollBar;
+		public static var scrollbarFeeler:Sprite;
 
 		// controls
 		public var slider:MySlider;
@@ -51,6 +52,7 @@ package
 
 		public static var image:Bitmap;
 		public static var overlayBitmap:BitmapData;
+		private static var currBG:String;
 		
 		// Frame count
 		public var lastSecondVal:Number=0;
@@ -63,6 +65,9 @@ package
 		public static var mouseIsOverObject:Boolean = false;
 		
 		public static var enableDraw:Boolean = true;
+		public static var jscriptMgr:ExternalInterfaceManager;
+		
+		private static var postLoadInited:Boolean = false;
 		
 		public function ThreeDApp()
 		{
@@ -73,19 +78,19 @@ package
 			globals.Init();
 			txtFieldMgr = new TitleFieldManager();
 			lastDragPos = new Point(0,0);
-			
-			CreateOutput();
-			output("starting creation");
-			output("loading background");
 
 			elements = new Sprite();
 			addChild(elements);
+			
 			overlaySprite = new Sprite();
 			addChild(overlaySprite);
 			loader = new LoaderDisplay(this);
 			addChild(loader);
 
 			CreateBG();
+			CreateOutput();
+			output("starting creation");
+			output("loading background");
 			output("create mask");
 
 			maskShape = CreateMask(spectrumMiddle);
@@ -100,6 +105,8 @@ package
 			elements.addChild(canvas);
 			progress = new ProgressTracker();
 			elements.addChild(progress);
+			scrollbar = new ScrollBar();
+			elements.addChild(scrollbar);
 			output("create bezier overlay");
 			CreateBezierOverlay();
 //			output("create debug elements");
@@ -110,6 +117,27 @@ package
 
 			output("creation finished, starting loading content"); 
 			content = new ContentManager();
+			
+			scrollbarFeeler = new Sprite();
+			scrollbarFeeler.graphics.beginFill(0xFF0000, 0);
+			scrollbarFeeler.graphics.drawRect(0, 0, 800, 1000);
+			scrollbarFeeler.graphics.endFill();
+			
+			jscriptMgr = new ExternalInterfaceManager();
+		}
+
+		public static function loadCallback():void
+		{
+			if (!postLoadInited)
+			{
+				jscriptMgr.call("loadCallback()");
+				postLoadInited = true;
+			}
+		}
+
+		public static function contentSelected(content):void
+		{
+			jscriptMgr.call("asContentChanged",content);
 		}
 
 		public static function InitCanvas(data:Object):void
@@ -171,7 +199,21 @@ package
 			bg.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
 			elements.addChild(bg);
 		}
-		
+		public static function SetBgImage(theBg:String):void
+		{
+			var formerBg = currBG;
+			currBG = theBg;
+			if (formerBg == currBG)
+				return;
+			content.LoadObject(theBg, ContentManager.swf, undefined, ThreeDApp.setBackground);
+		}
+		public static function setBackground(bg:DisplayObject):void
+		{
+			var theBG:Sprite = elements.getChildByName("bg") as Sprite;
+			if (theBG.numChildren > 0)
+				theBG.removeChildAt(0);
+			theBG.addChildAt(bg, 0);
+		}
 		public static function addToBackground(bg:DisplayObject):void
 		{
 			var theBG:Sprite = elements.getChildByName("bg") as Sprite; 
@@ -223,7 +265,7 @@ package
 		
 		public static function CreateMask(origin:ThreeDPack.ThreeDPoint):Shape
 		{
-			var localMaskShape = new Shape();
+			var localMaskShape:Shape = new Shape();
 			localMaskShape.graphics.beginFill(0x2D2D2D);
 			localMaskShape.graphics.lineStyle(0, 0x2D2D2D);
 //			localMaskShape.graphics.drawRect(0, 0, 600, 400);
@@ -308,12 +350,12 @@ package
 			stateOutput.x = 500;
 			stateOutput.y = 180;
 			stateOutput.width = 300;
-			stateOutput.height = 300;
+			stateOutput.height = 600;
 			stateOutput.multiline = true;
 			stateOutput.selectable = false;
 			stateOutput.defaultTextFormat = globals.textformatSmall;
 			stateOutput.text = "output created\n";
-			addChild(stateOutput);
+			elements.addChild(stateOutput);
 		} 
 		
 		public function CreateDebugElements():void
@@ -348,7 +390,7 @@ package
 			
 		}
 		
-		function matrixCallback(value:Number):void
+		public function matrixCallback(value:Number):void
 		{
 			ThreeDCanvas.projMatrix.Identity();// = new ThreeDMatrix();
 			ThreeDCanvas.projMatrix.makeProjectionMatrix(0, 1000, value,value, 1,1);
@@ -368,7 +410,7 @@ package
 		public static function output(line:String):void
 		{
 			stateOutput.appendText(line+"\n");
-			var numLines:Number = 20;
+			var numLines:Number = 60;
 			if(stateOutput.numLines>numLines)
 			{
 				var lastLines:String = ""; 
@@ -381,6 +423,25 @@ package
 		public static function getContent():ContentManager
 		{
 			return content;
+		}
+		
+		public static function BindScrollbar(field:TextField)
+		{
+			scrollbar.BindTextfield(field);
+		}
+		public static function UnbindScrollbar()
+		{
+			scrollbar.UnbindTextfield();
+		}
+		public static function addFeeler():Sprite
+		{
+			elements.addChild(scrollbarFeeler);
+			return scrollbarFeeler;
+		}
+		public static function deleteFeeler():Sprite
+		{
+			elements.removeChild(scrollbarFeeler);
+			return scrollbarFeeler;
 		}
 		
 		private function draw(event:Event):void
@@ -415,6 +476,8 @@ package
 			loader.draw();
 			
 			progress.Process();
+			
+			scrollbar.Process();
 		} 
 	}
 }

@@ -180,7 +180,6 @@
 			allControls = new Array();
 			tempEndIndex=0;
 			
-			trace("numSections:"+numSections);
 			if(numSections>0 && numSections%2==0){
 				//guideLine
 				for(var i:Number=0;i<numPointsOnSection;i++){

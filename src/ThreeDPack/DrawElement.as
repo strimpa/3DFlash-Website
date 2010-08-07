@@ -2,6 +2,7 @@ package ThreeDPack
 {
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.events.Event;
 
 	public class DrawElement extends Sprite
 	{
@@ -34,6 +35,7 @@ package ThreeDPack
 		public static var mouseIsDown:Boolean;
 		public static var clickPoint:ThreeDPoint;
 		public static var moveDelta:ThreeDPoint;
+		public static var somethingMoving:Boolean;
 		
 		public function DrawElement(name:String=""):void
 		{
@@ -48,6 +50,7 @@ package ThreeDPack
 			moveDelta = new ThreeDPoint();
 			this.pendingMovements = new Array();
 			setState(COLLAPSED);
+			somethingMoving = false;
 		}
 		
 		public function getParentObj():ThreeDObject
@@ -70,39 +73,39 @@ package ThreeDPack
 			return this.active;
 		}
 		
-		public function mouseOverHandler(event:MouseEvent):void
+		public function mouseOverHandler(event:Event):void
 		{
 			//trace("mouse over");
 			/**/
 		}
 
-		public function mouseOutHandler(event:MouseEvent):void
+		public function mouseOutHandler(event:Event):void
 		{
 			//trace("mouse out");
 			/**/
 		}
 
-		public function mouseClickHandler(event:MouseEvent):void
+		public function mouseClickHandler(event:Event):void
 		{
 //			trace("mouse click");
 			moveDelta = new ThreeDPoint();
-			clickPoint = new ThreeDPoint(event.stageX,event.stageY,0); 
+			clickPoint = new ThreeDPoint(mouseX,mouseY,0); 
 			mouseIsDown = true;
 		}
-		public function mouseUpHandler(event:MouseEvent):void
+		public function mouseUpHandler(event:Event):void
 		{
 //			trace("mouse up");
 			mouseIsDown = false;
 			moveDelta = new ThreeDPoint();
 		}
 		
-		public function mouseMoveHandler(event:MouseEvent):void
+		public function mouseMoveHandler(event:Event):void
 		{
 			if(mouseIsDown)
 			{
 //				trace("mouseIsDown:"+mouseIsDown);
-				moveDelta.x = event.stageX - clickPoint.x; 
-				moveDelta.y = event.stageY - clickPoint.y; 
+				moveDelta.x = mouseX - clickPoint.x; 
+				moveDelta.y = mouseY - clickPoint.y; 
 				MouseDragHandler(event);
 			}
 		}
@@ -124,7 +127,7 @@ package ThreeDPack
 			}
 		}
 		
-		public function MouseDragHandler(event:MouseEvent):void
+		public function MouseDragHandler(event:Event):void
 		{
 		} 
 
@@ -174,22 +177,32 @@ package ThreeDPack
 		
 		public function OnExtended():void
 		{
+			somethingMoving = false;
 			useCallback(EXTENDED);
 		}
 		
 		public function OnCollapsed():void
 		{
+			somethingMoving = false;
 			useCallback(COLLAPSED);
 		}
 
 		public function OnCollapsing():void
 		{
+			somethingMoving = true;
 			useCallback(COLLAPSING);
 		}
 		
 		public function OnExtending():void
 		{
+			somethingMoving = true;
 			useCallback(EXTENDING);
+		}
+		
+		public static function IsSomethingMoving():Boolean
+		{
+			ThreeDApp.output("somethingMoving:"+somethingMoving)
+			return somethingMoving;
 		}
 
 		public function Process(parent:ThreeDObject=undefined):void
@@ -239,6 +252,11 @@ package ThreeDPack
 		public function getState():uint
 		{
 			return mCurrState;
+		}
+		
+		public function isMoving():Boolean
+		{
+			return mCurrState == COLLAPSING || mCurrState == EXTENDING;
 		}
 	}
 }
