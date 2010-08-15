@@ -1,0 +1,56 @@
+@charset "utf-8";
+body {
+	background-color: #2D2D2D;
+	margin: 0;
+}
+#yui-history-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+/*  visibility: hidden;
+*/
+}
+#bd {
+	position:absolute;
+	top:0px;
+	height:50px;
+	width:500px;
+}
+#table_outside {
+	border-width:5px;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: solid;
+	vertical-align: top;
+	height:100%;
+	overflow: hidden;
+	position:absolute;
+	z-index: 1;
+	left: 150px;
+}
+#contentCell {
+	border: 1px solid #C0C0C0;
+}
+
+#outputStyle {
+	position:absolute;
+	left:500px;
+	top:280px;
+	width:300px;
+	height:300px;
+	background-color:#2D2D2D;
+	color:#3D3F3D;
+	text-decoration: none;
+}
+#contentLayer {
+	z-index: 2;
+	width:600px;
+	height:600px;
+	font-size: 24px;
+	position: absolute;
+	left: 220px;
+	top: 150px;
+}
