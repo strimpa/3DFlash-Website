@@ -34,9 +34,10 @@ package
 			LoadObject("baloo.swf", swf, undefined, ThreeDApp.addToBackground);
 			LoadObject("content.xml", xml, contentXML, ThreeDApp.InitCanvas);
 			LoadObject("sphere.obj", sceneData, undefined, ThreeDPack.Obj2As.onData);
-			LoadObject("html/contentStyle_as.css", css, undefined, Content.contentStyleLoaded);
+			LoadObject("../../contentHtml/contentStyle_as.css", css, undefined, Content.contentStyleLoaded);
 			LoadObject("barock.swf", swf, undefined, Content.contentBGLoaded);
 			LoadObject("exit.swf", swf, undefined, ThreeDCanvas.exitSpriteLoaded);
+			LoadObject("RotHint.swf", swf, undefined, ThreeDPack.Polygon.SetRotHintSprite);
 			LoadObject("keywords.swf", swf, undefined, ThreeDApp.keywords.onData);
 		}
 		
@@ -71,13 +72,13 @@ package
 					if(item[type]==xml)
 						contentXML = XML(data as String);
 				}
-				else
-				{
-					trace("item.storage==undefined");
-				}
+				//else
+				//{
+					//trace("item.storage==undefined");
+				//}
 			    if(item[callback]!=undefined)
 			    {
-//			    	trace("item.callback!=undefined:"+item[callback]);
+			    	trace("item.callback!=undefined:"+item[callback]);
 			    	item[callback](data);
 			    }
 			    else
@@ -100,12 +101,13 @@ package
 		{
 				fonts = Font.enumerateFonts();
 				var font:Font;
+				trace("fonts.length:"+fonts.length);
 				for(var x:uint=0; x<fonts.length;x++)
 				{
 				    font = fonts[x];
-				    //trace("name : "+font.fontName);
-				    //trace("style : "+font.fontStyle);
-				    //trace("type : "+font.fontType);
+				    trace("name : "+font.fontName);
+				    trace("style : "+font.fontStyle);
+				    trace("type : "+font.fontType);
 				
 				}		
 				ThreeDApp.InitGlobals();
@@ -119,6 +121,7 @@ package
 			var xmlitem:XML = contentXML.content[number];
 			content.mTitle = xmlitem.title;
 			content.mCategory = xmlitem.category;
+			content.mFolderName = xmlitem.folder;
 			var keywordString:String = xmlitem.keywords;
 			content.mKeywords = keywordString.split(",");//
 			content.mContentUrl = xmlitem.url;

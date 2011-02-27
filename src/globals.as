@@ -10,6 +10,13 @@ package
 		public static var textformatSmallBright:TextFormat;
 		public static var textformatMenuTitle:TextFormat;
 		public static var textformatCubeTitle:TextFormat;
+		public static var currentDevDomain:String = "http://www.gunnardroege.de/";//"http://localhost/website/";
+		public static var flashBinRoot:String = currentDevDomain + "3DEngine/bin/";
+		public static var htmlRoot:String = currentDevDomain + "contentHtml/";
+		public static var contentExtensions:Array = [ "pdf", "zip", "xml" ];
+		public static var pictureExtensions:Array = [ "jpg", "png", "mov" ];
+		
+		public static var needsCubeRotHint = true;
 		
 		public function globals()
 		{

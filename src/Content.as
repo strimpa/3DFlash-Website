@@ -14,6 +14,7 @@ package {
 	public class Content
 	{
 		public var mTitle:String;
+		public var mFolderName:String;
 		public var mCategory:String;
 		public var mKeywords:Array;
 		public var mContentUrl:String;
@@ -36,7 +37,7 @@ package {
 		
 		public function load():void
 		{
-			ThreeDApp.getContent().LoadObject(mContentUrl, ContentManager.xml, undefined, this.onData);
+			ThreeDApp.getContent().LoadObject(globals.htmlRoot+mContentUrl, ContentManager.xml, undefined, this.onData);
 		}
 		
 		public static function contentStyleLoaded(data:Object):void

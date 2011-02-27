@@ -34,7 +34,7 @@ package
 		public static var spectrumMiddle:ThreeDPack.ThreeDPoint = new ThreeDPoint(400,400,0);
 		public var maskShape:Shape;
 		public static var circleRadius:uint = 200;
-		public var styleString:String = "	color:#3D3F3D;";
+//		public var styleString:String = "	color:#3D3F3D;";
 
 		public static var content:ContentManager;
 		public static var txtFieldMgr:TitleFieldManager;
@@ -135,9 +135,14 @@ package
 			}
 		}
 
-		public static function contentSelected(content):void
+		public static function contentSelected(content, url):void
 		{
-			jscriptMgr.call("asContentChanged",content);
+			jscriptMgr.call("asContentChanged", content, globals.htmlRoot+url);
+		}
+
+		public static function picClicked(picUrl, title, doc):void
+		{
+			jscriptMgr.call("showImage", title, picUrl, globals.htmlRoot + "/" + doc);
 		}
 
 		public static function InitCanvas(data:Object):void

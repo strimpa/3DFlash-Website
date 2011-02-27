@@ -32,7 +32,7 @@ package
 			try
 			{
 				load(new URLRequest(item));
-				//trace("loadItem():"+objectName);
+				trace("loadItem():"+objectName);
 				//trace("childLoadingStructs.length:"+childLoadingStructs.length);
 				registerQueueTuple(contentLoaderInfo, item);
 			}

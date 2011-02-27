@@ -23,6 +23,8 @@
 		public static const START:uint = 0, SCOPE_SELECT:uint = 1, SCOPE_SELECTED:uint = 2, CONTENT_SELECT:uint = 3, CONTENT_SELECTED:uint = 4;
 		public static const CATEGORY_SCOPE:uint = 0, KEYWORD_SCOPE:uint = 1;
 		private var stateStrings:Array = ["start", "scope select", "scope selected", "content select", "content open"];
+		private var helpStrings:Array = ["start", "scope select", "scope selected", "content select", "content open"];
+		private var helpField:TextField;
 		private var stateFields:Array;
 		private var button:SimpleButton;
 		private var statePosition:Point = new Point(598, 84);
@@ -82,6 +84,18 @@
 				field.height = 20;
 				field.rotation = 0.3;
 			}
+			helpField = new TextField();
+			helpField.selectable = false;
+			helpField.wordWrap = false;
+			helpField.multiline = false;
+			helpField.defaultTextFormat = globals.textformatSmallBright;
+			helpField.text = "";
+			addChild(helpField);
+			helpField.x = stateOffset;
+			helpField.y = statePosition.y - 40;
+			//helpField.width = 0;
+			helpField.height = 40;
+			//helpField.rotation = 0.3;
 			
 			newContentRequested = undefined;
 			scopeTypeToCarryOver = -1;
@@ -151,7 +165,6 @@
 			switch(state)
 			{
 				case 0:
-					KeywordManager.resetPositions();
 					break;
 				case 1:
 					break;
@@ -181,12 +194,13 @@
 				{
 					scopeType = -1;
 					lastChosenKeyword = undefined;
-					ThreeDApp.SetBgImage(ContentManager.bg1);
+					KeywordManager.resetPositions();
+//					ThreeDApp.SetBgImage(ContentManager.bg1);
 				}
 				break;
 				case SCOPE_SELECTED:
 				{
-					ThreeDApp.SetBgImage(ContentManager.bg2);
+//					ThreeDApp.SetBgImage(ContentManager.bg2);
 				}
 				break;
 				case CONTENT_SELECTED:
@@ -205,6 +219,7 @@
 			if (newState != state)
 			{
 				state = newState;
+				helpField.text = helpStrings[newState];
 				activeCircle.x = statePosition.x + (stateOffset * (state+1));
 			}
 			var allFieldsCollapsed:Boolean = true;

@@ -32,6 +32,9 @@
 		public function registerLoadingItem(name:String):void
 		{
 			loadingItems.push(name);
+			var lastSlash = name.lastIndexOf("/")+1;
+			name = name.substr(lastSlash, name.length - lastSlash);
+			trace(name);
 			var tf:TextField = new TextField();
 			tf.selectable = false;
 			tf.wordWrap = false;
@@ -61,7 +64,7 @@
 		public function updateProgress(name:String, progress:Number):void
 		{
 			var index:uint = loadingItems.indexOf(name);
-			//trace("updateProgress: "+progress);
+			trace("updateProgress: "+progress);
 			loadingProgresses[index] = progress;
 		}
 

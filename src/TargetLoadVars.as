@@ -12,7 +12,6 @@
 		var callObj:Object;
 		var httpStatusType:String;
 		var objectName:String;
-		var checkTextField:TextField;
 		var tempString:String;
 		
 		public function TargetLoadVars(callObj_p:Object):void
@@ -21,13 +20,12 @@
 			objectName = "";
 			this.callObj=callObj_p;
 			configureListeners(this);
-			checkTextField = new TextField();
 		}
 		
 		public function loadItem(item:String)
 		{
 			objectName = item;
-			load(new URLRequest("http://www.gunnardroege.de/3DEngine/bin/"+item));//"http://www.gunnardroege.de/3DEngine/bin/"+item)); //http://localhost/website/3DEngine/bin
+			load(new URLRequest(item));//"http://www.gunnardroege.de/3DEngine/bin/"+item)); //http://localhost/website/3DEngine/bin
 		    ThreeDApp.loader.registerLoadingItem(objectName);
 		}
 
@@ -46,7 +44,6 @@
             var loader:URLLoader = URLLoader(event.target);
 //            trace("completeHandler: " + " for object " + objectName);// + loader.data);
 			var theString:String = loader.data as String;
-			checkTextField.htmlText = theString;
 			objectName = "";
 			callObj.onData(theString);
 		}

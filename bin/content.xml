@@ -2,198 +2,226 @@
 <root>
 	<content>
 		<title>FancyChecker</title>
+		<folder>FancyChecker</folder>
 		<category>programming</category>
 		<keywords>3D,3dsmax,programming</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/index.html</url>
+		<url>FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>23:50</title>
+		<folder>2350</folder>
 		<category>3DArt</category>
 		<keywords>3D,film,design,uni,barcelona</keywords>
 		<description>1</description>
-		<url>html/2350/index.html</url>
+		<url>2350/index.html</url>
 	</content>
 	<content>
 		<title>Solechat</title>
+		<folder>Solechat</folder>
 		<category>3DArt</category>
 		<keywords>3D,film,design,uni,barcelona</keywords>
 		<description>1</description>
-		<url>html/Solechat/index.html</url>
+		<url>Solechat/index.html</url>
 	</content>
 	<content>
 		<title>Complicity</title>
+		<folder>Complicity</folder>
 		<category>3DArt</category>
 		<keywords>3D,film,design,uni,barcelona</keywords>
 		<description>1</description>
-		<url>html/Complicity/index.html</url>
+		<url>Complicity/index.html</url>
 	</content>
 	<content>
 		<title>Kummernuss</title>
+		<folder>Kummernuss</folder>
 		<category>3DArt</category>
 		<keywords>3D,film,uni</keywords>
 		<description>1</description>
-		<url>html/Kummernuss/index.html</url>
+		<url>Kummernuss/index.html</url>
 	</content>
 	<content>
 		<title>Los Buenos</title>
+		<folder>LosBuenos</folder>
 		<category>3DArt</category>
 		<keywords>3D,film,design,uni,barcelona</keywords>
 		<description>1</description>
-		<url>html/LosBuenos/index.html</url>
+		<url>LosBuenos/index.html</url>
 	</content>
 	<content>
 		<title>Mental Ray stuff</title>
+		<folder>MentalRayStuff</folder>
 		<category>3DArt</category>
 		<keywords>3D</keywords>
 		<description>1</description>
-		<url>html/MentalRay/index.html</url>
+		<url>MentalRay/index.html</url>
 	</content>
 	<content>
 		<title>Cristina</title>
+		<folder>Cris</folder>
 		<category>web</category>
 		<keywords>web,design,programming</keywords>
 		<description>1</description>
-		<url>html/Cris/index.html</url>
+		<url>Cris/index.html</url>
 	</content>
 	<content>
 		<title>FH Luebeck</title>
+		<folder>FHLuebeck</folder>
 		<category>web</category>
 		<keywords>web,design</keywords>
 		<description>1</description>
-		<url>html/FHLuebeck/index.html</url>
+		<url>FHLuebeck/index.html</url>
 	</content>
 	<content>
+		<folder>Wiebo</folder>
 		<title>Diplom Wiebke</title>
 		<category>web</category>
-		<keywords>web,design,programming</keywords>
+		<keywords>web,design,programming,university</keywords>
 		<description>1</description>
-		<url>html/Wiebo/index.html</url>
+		<url>Wiebo/index.html</url>
 	</content>
 	<content>
 		<title>Rock'n'Roll</title>
+		<folder>RocknRoll</folder>
 		<category>web</category>
 		<keywords>web,design,programming</keywords>
 		<description>1</description>
-		<url>html/RocknRoll/index.html</url>
+		<url>RocknRoll/index.html</url>
 	</content>
 	<content>
 		<title>inema</title>
+		<folder>inema</folder>
 		<category>web</category>
 		<keywords>web,design,programming</keywords>
 		<description>1</description>
-		<url>html/inema/index.html</url>
+		<url>inema/index.html</url>
 	</content>
 	<content>
 		<title>Diplom</title>
+		<folder>Diplom</folder>
 		<category>programming</category>
 		<keywords>design,programming,uni,games,leeds</keywords>
 		<description>1</description>
-		<url>html/Diplom/index.html</url>
+		<url>Diplom/index.html</url>
 	</content>
 	<content>
 		<title>Diplom Nina</title>
+		<folder>DiplomNina</folder>
 		<category>programming</category>
 		<keywords>programming,uni</keywords>
 		<description>1</description>
-		<url>html/Nina/index.html</url>
+		<url>Nina/index.html</url>
 	</content>
 	<content>
 		<title>Maxscripts</title>
+		<folder>Maxscripts</folder>
 		<category>programming</category>
 		<keywords>programming,3D,games</keywords>
 		<description>1</description>
-		<url>html/Maxscripts/index.html</url>
+		<url>Maxscripts/index.html</url>
 	</content>
 	<content>
 		<title>CampusMap</title>
+		<folder>CampusMap</folder>
 		<category>programming</category>
 		<keywords>programming,uni,3D,design,web,barcelona,games</keywords>
 		<description>1</description>
-		<url>html/CampusMap/index.html</url>
+		<url>CampusMap/index.html</url>
 	</content>
 	<content>
 		<title>Kicker</title>
+		<folder>Kicker</folder>
 		<category>programming</category>
 		<keywords>programming,uni,3D,web,games</keywords>
 		<description>1</description>
-		<url>html/Kicker/index.html</url>
+		<url>Kicker/index.html</url>
 	</content>
 	<content>
 		<title>Vice City Stories</title>
+		<folder>VCS</folder>
 		<category>3DArt</category>
 		<keywords>3D,games</keywords>
 		<description>1</description>
-		<url>html/ViceCity/index.html</url>
+		<url>ViceCity/index.html</url>
 	</content>
 	<content>
 		<title>Table Tennis</title>
+		<folder>TableTennis</folder>
 		<category>3DArt</category>
 		<keywords>3D,games,programming</keywords>
 		<description>1</description>
-		<url>html/TableTennis/index.html</url>
+		<url>TableTennis/index.html</url>
 	</content>
 	<content>
 		<title>GTA IV</title>
+		<folder>GTAIV</folder>
 		<category>3DArt</category>
 		<keywords>3D,games</keywords>
 		<description>1</description>
-		<url>html/GTAIV/index.html</url>
+		<url>GTAIV/index.html</url>
 	</content>
 	<content>
 		<title>China Town Wars</title>
+		<folder>CTW</folder>
 		<category>3DArt</category>
 		<keywords>3D,games,programming</keywords>
 		<description>1</description>
-		<url>html/CTW/index.html</url>
+		<url>CTW/index.html</url>
 	</content>
 	<content>
 		<title>twentytwo</title>
+		<folder>twentytwo</folder>
 		<category>web</category>
 		<keywords>1</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/index.html</url>
+		<url>FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twentythree</title>
+		<folder>twentythree</folder>
 		<category>web</category>
 		<keywords>2</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/index.html</url>
+		<url>FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twentyfour</title>
+		<folder>twentyfour</folder>
 		<category>3DArt</category>
 		<keywords>2</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/index.html</url>
+		<url>FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twentyfive</title>
+		<folder>twentyfive</folder>
 		<category>web</category>
 		<keywords>3</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/index.html</url>
+		<url>FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twentysix</title>
+		<folder>twentysix</folder>
 		<category>web</category>
 		<keywords>4</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/index.html</url>
+		<url>FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twetyseven</title>
+		<folder>twetyseven</folder>
 		<category>analogue</category>
 		<keywords>4</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/index.html</url>
+		<url>FancyChecker/index.html</url>
 	</content>
 	<content>
 		<title>twentyeight</title>
+		<folder>FancyChecker</folder>
 		<category>3DArt</category>
 		<keywords>4</keywords>
 		<description>1</description>
-		<url>html/FancyChecker/index.html</url>
+		<url>FancyChecker/index.html</url>
 	</content>
 </root>

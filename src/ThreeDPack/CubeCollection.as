@@ -50,7 +50,7 @@ package ThreeDPack
 		{
 			for each(var c:Cube in mCubes)
 			{
-				if (c.getContent().mTitle == title )
+				if (c.getContent().mFolderName == title )
 					return c;
 			}
 			return undefined;

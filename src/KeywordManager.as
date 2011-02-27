@@ -5,6 +5,7 @@ package
 	 */
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.events.DRMCustomProperties;
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
@@ -53,6 +54,7 @@ package
 			var secondRadius:uint = 210;
 			for (var i:uint = 0; i < menuMovie.numChildren; i++ )
 			{
+				trace("menuMovie.numChild:"+i);
 				var rand:Number = Math.random();
 				var buttonSprite:Sprite = new Sprite();
 				buttonSprite.graphics.beginFill(0x888888, 0.5);
@@ -103,13 +105,21 @@ package
 		
 		public function Update(mousePos:Point, currentKeywords:Array):void
 		{
-			if(menuMovie==undefined)
+			if (menuMovie == undefined)
+			{
 				return;
-			for(var pointNo:Number=0;pointNo<menuMovie.numChildren;pointNo++)
-				for each (var index:Number in currentKeywords)
-					if(index==pointNo)
-//				rotateMenuPoint(menuMovies[pointNo], pointNo, Math.atan2(mousePos.y-middle.y, mousePos.x-middle.x));
-						movements[pointNo] = -Math.atan2(-(mousePos.y-middle.y), mousePos.x-middle.x);
+			}
+			for (var pointNo:Number = 0; pointNo < menuMovie.numChildren; pointNo++)
+			{
+				for each (var key:String in currentKeywords)
+				{
+					var index:Number = keywords.indexOf(key);
+					if (index!=0 && index == pointNo)
+					{
+						movements[pointNo] = -Math.atan2( -(mousePos.y - middle.y), mousePos.x - middle.x);
+					}
+				}
+			}
 		}
 		
 		static public function resetPositions():void

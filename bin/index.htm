@@ -1,25 +1,44 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<link href="styles_new.css" rel="stylesheet" type="text/css" />
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>3DEngine</title>
-</head>
-
-<body onload="pageInit();">
-<iframe id="yui-history-iframe" src="ConcreteLeaking0022_2_M.jpg"></iframe>
-<input id="yui-history-field" type="hidden">
-
-<div border="1" id="bd"></div>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html> 
+  <head> 
+    <title>Portfolio - Gunnar Droege - Techincal Artist</title> 
+	<link rel="stylesheet" type="text/css" href="styles_new.css"/>
+	<!--YUI-->
+<!--    <link rel="stylesheet" type="text/css" href="http://developer.yahoo.com/yui/build/reset-fonts-grids/reset-fonts-grids.css"/> 
+     <link rel="stylesheet" type="text/css" href="http://developer.yahoo.com/yui/examples/history/assets/yui-bhm-navbar-demo.css"/> 
+-->		
+	<!--Lightbox-->
+	<script type="text/javascript" src="lightbox/js/prototype.js"></script>
+    <script type="text/javascript" src="lightbox/js/scriptaculous.js?load=effects,builder"></script>
+    <script type="text/javascript" src="lightbox/js/lightbox.js"></script>
+    <link rel="stylesheet" href="lightbox/css/lightbox.css" type="text/css" media="screen" />
+  </head> 
+  <body onLoad="pageInit();"> 
  
+    <!-- Static markup required by the browser history utility. Note that the
+         iframe is only used on Internet Explorer. If this page is server
+         generated (by a PHP script for example), it is a good idea to create
+         the IFrame ONLY for Internet Explorer (use server side user agent sniffing) --> 
  
-<div border="0" id="table_outside"><object id="3DEngine" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="800" height="1000">
+<iframe id="yui-history-iframe" src="bg.jpg"></iframe> 
+    <input id="yui-history-field" type="hidden"> 
+ 
+    <!-- Handle the case when client-side scripting is disabled. Note that if
+         this page is server generated (by a PHP script for example), you can
+         degrade gracefully by using the "section" URL parameter and reload the
+         entire page. --> 
+ 
+    <noscript> 
+This example requires client-side scripting enabled.
+    </noscript> 
+ 
+<div border="0" id="table_outside">	
+	<object id="3DEngine" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="800" height="1000">
     <param name="movie" value="3DEngine.swf" />
     <param name="quality" value="high" />
     <param name="wmode" value="transparent" />
     <param name="swfversion" value="9.0.45.0" />
     <param name="allowScriptAccess" value="always" />
-    <!-- This param tag prompts users with Flash Player 6.0 r65 and higher to download the latest version of Flash Player. Delete it if you don’t want users to see the prompt. -->
     <param name="expressinstall" value="Scripts/expressInstall.swf" />
     
      <embed src="3DEngine.swf" quality="high" bgcolor="#2D2D2D"
@@ -31,117 +50,18 @@
 
   </object>
 </div>
-
-<div>
-  <iframe id="contentLayer" src="html/FancyChecker/FancyChecker.html"></iframe>
-</div>
-<script src="Scripts/AC_RunActiveContent.js" type="text/javascript"></script>
-<script src="Scripts/swfobject_modified.js" type="text/javascript"></script>
-<script src="Scripts/script.js" type="text/javascript"></script>
-<!-- Individual YUI JS files --> 
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/yahoo/yahoo-min.js"></script> 
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/event/event-min.js"></script> 
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/history/history-min.js"></script> 
-<script language="JavaScript">
-     var jsReady = false;
-	 var contentStringToLoad = undefined;
-     function isReady() {
-         return jsReady;
-     }
-     function pageInit() {
-         jsReady = true;
-     }
-     function thisMovie(movieName) {
-         if (navigator.appName.indexOf("Microsoft") != -1) {
-             return window[movieName];
-         } else {
-             return document[movieName];
-         }
-     }
-	 function gup( name )
-	 {
-		name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-		var regexS = "[\\?&]"+name+"=([^&#]*)";
-		var regex = new RegExp( regexS );
-		var results = regex.exec( window.location.href );
-		if( results == null )
-			return "";
-		else
-			return results[1];
-	 }
-	 function loadCallback()
-	 {
-		 if(undefined!=contentStringToLoad)
-		 {
-			contentStringToLoad = contentStringToLoad.replace("%20", " ");
-		 	sendToActionScript(contentStringToLoad);
-		 }
-	 }
-     function sendToActionScript(value) {
-		 var theMovie = thisMovie("3DEngine");
-		// alert(theMovie);
-         theMovie.sendToActionScript(value);
-     }
-	 function asContentChanged(section)
-	 {
-//		 alert("changed to "+section);
-		 YAHOO.util.Dom.get("bd").innerHTML = section;
-		 YAHOO.util.History.navigate("de.gunnardroege.portfolio", section);
-	 }
-
-//	window.onbeforeunload = function () {
-//		//alert(window.location.href);
-//		_isset=0;
-//		//return "You have not saved your document yet.  If you continue, your work will not be saved."
-//	}
-	function myModuleStateChangeHandler (state) 
-	{
-		// Update the UI of your module according to the "state" parameter
-		//...
-		alert("myModuleStateChangeHandler");
-	}
-	YAHOO.util.History.onReady(function () 
-	{
-		//...
-		var myModuleCurrentState = YAHOO.util.History.getCurrentState("de.gunnardroege.portfolio");
-		// Update the UI of your module according to "myModuleCurrentState"
-		//...
-		alert("onReady");	
-	});
-
-
-alert("page reload!");
-
-swfobject.registerObject("3DEngine");
-initContentWindow();
-
-var myModuleBookmarkedState = YAHOO.util.History.getBookmarkedState("de.gunnardroege.portfolio");
-// If there is no bookmarked state, assign the default state:
-var myModuleInitialState = myModuleBookmarkedState || "myModuleDefaultState";
-
-YAHOO.util.History.register("de.gunnardroege.portfolio", myModuleInitialState, myModuleStateChangeHandler);
-
-    // Initialize the browser history management library.
-    try {
-        YAHOO.util.History.initialize("yui-history-field", "yui-history-iframe");
-    } catch (e) {
-        // The only exception that gets thrown here is when the browser is
-        // not supported (Opera, or not A-grade) Degrade gracefully.
-        // Note that we have two options here to degrade gracefully:
-        //   1) Call initializeNavigationBar. The page will use Ajax/DHTML,
-        //      but the back/forward buttons will not work.
-        //   2) Initialize our module. The page will not use Ajax/DHTML,
-        //      but the back/forward buttons will work. This is what we
-        //      chose to do here:
-        loadSection(initSection);
-    }
-
-
-var goToContent = gup("content");
-if(goToContent!=undefined)
-{
-	contentStringToLoad = goToContent;
-}
-</script>
-</body>
-</html>
+<!--
+<a rel="lightbox" href="html/Complicity/andToDie.png"><img src="html/Complicity/andToDie.png" name="pic1" width="200" height="200" id="pic1" align="left" /></a> 
+-->
+<div id="bd"></div>
+<div id="debugOutput"></div>
+<iframe id="parseContent"></iframe>
+    <!-- Dependencies --> 
+    <script src="http://developer.yahoo.com/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+    <script src="http://developer.yahoo.com/yui/build/connection/connection.js"></script> 
+    <script src="http://developer.yahoo.com/yui/build/history/history.js"></script>
+ 
+    <script src="js/init.js"></script>
+ 
+  </body> 
+</html> 

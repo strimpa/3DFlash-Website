@@ -11,6 +11,8 @@
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.events.Event;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 
 	public class Polygon extends DrawElement
 	{
@@ -41,6 +43,12 @@
 		public var moveMatrix:ThreeDMatrix;
 		public var pointMoveIndices:Array;
 		public var otherElementParts:Array;
+		
+		private var hintTimer:Timer;
+		private const rotHintHeight = 50;
+		private var rotHintPos:Number;
+		private var rotHintState:uint;
+		private static var rotHintSprite:Sprite;
 		
 		public function Polygon(points_p:Array, unsortedIndex:uint, parent:ThreeDObject=undefined, normals:Array=undefined, copyPropsFrom:Polygon=undefined):void{
 			this.pointIndices = points_p;
@@ -74,6 +82,14 @@
 //			this.blendMode = BlendMode.SCREEN; TOOOOOOOOOOOO Costy
 
 			bubbleClickEvent = true;
+			rotHintPos = 1.0;
+			rotHintState = DrawElement.COLLAPSED;
+			rotHintSprite = undefined;
+		}
+		
+		public static function SetRotHintSprite(s:Object):void
+		{
+			rotHintSprite = (s as Sprite);
 		}
 		
 		public function calcFaceNormal():void
@@ -163,6 +179,7 @@
 		
 		public override function mouseClickHandler(event:Event):void
 		{
+			trace("mouseClickHandler:"+notMoveable() +", "+ bubbleClickEvent);
 			if(notMoveable())
 				return;
 			if(parentObj && bubbleClickEvent)
@@ -234,6 +251,39 @@
 			if (undefined != parent)
 				parentObj = parent;
 				
+			if (undefined != rotHintSprite)
+			{
+				if (rotHintState != DrawElement.COLLAPSED)
+				{
+					trace("rotHintPos:"+rotHintPos);
+					if (rotHintState == DrawElement.EXTENDING)
+					{
+						if(rotHintPos > 0)
+							rotHintPos -= 0.1;
+						else {
+							rotHintState = DrawElement.EXTENDED;
+						}
+					}
+					else if (rotHintState == DrawElement.COLLAPSING)
+					{
+						if(rotHintPos < 1.0)
+							rotHintPos += 0.1;
+						else
+						{
+							rotHintState = DrawElement.COLLAPSED;
+						}
+					}
+					rotHintSprite.x = 131;
+					rotHintSprite.y = 625 + (rotHintPos * 50);
+					rotHintSprite.alpha = 1.0 - rotHintPos;
+				}
+				else
+				{
+					if(this.contains(rotHintSprite))
+						this.removeChild(rotHintSprite);
+				}
+			}
+
 			currColour = parentObj.currColour;
 		}
 		
@@ -242,6 +292,10 @@
 			var back:Boolean = moving || (titleField && titleField.alpha < 1);
 			return back;
 		}
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Event handling
+		////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		public override function OnCollapsed():void
 		{
@@ -265,12 +319,23 @@
 		{
 			super.OnCollapsing();
 			ThreeDApp.UnbindScrollbar();
+			var button:DisplayObject = rotHintSprite.getChildByName("closeButton");
+			if (button)
+			{
+				button.removeEventListener(MouseEvent.MOUSE_DOWN, closeRotHint);
+			}
+			if(hintTimer)
+				hintTimer.stop();
+			if(this.contains(rotHintSprite))
+				this.removeChild(rotHintSprite);
+			rotHintState = DrawElement.COLLAPSED;
 		}
 		
 		public override function OnExtending():void
 		{
 			addChild(textSprite);
 			textSprite.alpha = 1;
+			rotHintState = DrawElement.COLLAPSED;
 			super.OnExtending();
 		}
 		
@@ -280,22 +345,75 @@
 			{
 				ThreeDApp.BindScrollbar(textField);
 			}
+			bubbleClickEvent = true;
 		}
-		
-		//public override function OnExtended():void
-		//{
-			//ThreeDCanvas.showExitSprite(this.parentObj as Cube);
-		//}
-		//
 		
 		public function LinkHandler(event:TextEvent):void
 		{
 			bubbleClickEvent = false;
-			ProgressTracker.requestNewContent(event.text);
-			ThreeDCanvas.exitHandler(event);
+			if (event.text.match("pic:"))
+			{
+				event.text = event.text.replace("pic:", "");
+				var title:String = (parentObj as Cube).getContent().mFolderName;
+				var doc:String = (parentObj as Cube).getContent().mContentUrl;
+				ThreeDApp.picClicked(event.text, title, doc);
+			}
+			else
+			{
+				ProgressTracker.requestNewContent(event.text);
+				parentObj.jump();
+				ThreeDCanvas.exitHandler(event);
+			}
 		}
 		
-		public function setText(text:String)
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Hint handling
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		public function startHintTimer():void
+		{
+			if (undefined!=rotHintSprite && globals.needsCubeRotHint && rotHintState == DrawElement.COLLAPSED)
+			{
+				hintTimer = new Timer(3000, 1);
+				hintTimer.addEventListener(TimerEvent.TIMER, timerListener);
+				hintTimer.start();
+				trace("timer started");
+			}
+		}
+		
+		public function closeRotHint(e:MouseEvent):void
+		{
+			trace("collapsing rothint");
+			rotHintState = DrawElement.COLLAPSING;
+			var button:DisplayObject = rotHintSprite.getChildByName("closeButton");
+			if (button)
+			{
+				button.removeEventListener(MouseEvent.MOUSE_DOWN, closeRotHint);
+			}
+			globals.needsCubeRotHint = false;
+			e.stopImmediatePropagation();
+		}
+		
+		private function timerListener (e:TimerEvent):void
+		{
+			trace("extending rothint");
+			rotHintState = DrawElement.EXTENDING;
+			rotHintPos = 1.0;
+			this.addChild(rotHintSprite);
+			rotHintSprite.alpha = 0.0;
+			//var maskSprite:Sprite = new Sprite();
+			//maskSprite.graphics.drawRect(this.x, this.y, this.width, this.height);
+			//this.addChild(maskSprite);
+			//rotHintSprite.mask = maskSprite;
+			var button:DisplayObject = rotHintSprite.getChildByName("closeButton");
+			if (button)
+			{
+				button.addEventListener(MouseEvent.MOUSE_DOWN, closeRotHint);
+			}
+//			hintTimer.stop(); not needed due to "1" parameter
+		}
+		
+		public function setText(text:String, folderName:String)
 		{
 			if(!textField)
 			{
@@ -310,6 +428,30 @@
 					textField.blendMode = BlendMode.LAYER;
 					textSprite.addChild(textField);
 					textField.styleSheet = Content.getStyle();
+					var eventRootString = globals.htmlRoot + folderName
+					var picEventRootString = "href=\"event:pic:" + globals.htmlRoot + folderName
+					
+					// Inserting remote image path and lightbox rel tag
+					trace(text);
+					var myPattern:RegExp = /src=\"/g;
+					text = text.replace(myPattern, "src=\"" + eventRootString + "/");
+					// Get all links
+					for each(var ext:String in globals.contentExtensions)
+					{
+						myPattern = new RegExp("href=\"(.*)\."+ext, "g");
+						text = text.replace(myPattern, "target=\"blank\" href=\""+eventRootString + "/$1."+ext);
+						myPattern = new RegExp("href=\"(.*)\."+ext.toUpperCase(), "g");
+						text = text.replace(myPattern, "target=\"blank\" href=\""+eventRootString + "/$1."+ext);
+					}
+					for each(var ext:String in globals.pictureExtensions)
+					{
+						myPattern = new RegExp("href=\"(.*)\."+ext, "g");
+						text = text.replace(myPattern, picEventRootString + "/$1."+ext);
+						myPattern = new RegExp("href=\"(.*)\."+ext.toUpperCase(), "g");
+						text = text.replace(myPattern, picEventRootString + "/$1."+ext);
+					}
+					trace(text);
+					
 					textField.htmlText = text;
 					var picLoader:TargetLoad = ContentManager.getLoader();
 					var picsFound:Boolean = false;
@@ -318,8 +460,8 @@
 					for each(var picId in pictureIds)
 					{
 						var ref:DisplayObject = textField.getImageReference(picId);
-						if(ref)
-							trace("got pic: " + picId);
+						//if(ref)
+							//trace("got pic: " + picId);
 						if (ref && (ref is Loader))
 						{
 							picsFound = true;

@@ -110,6 +110,10 @@
 				poly.extend();
 			if(cb!=undefined)
 				polygons[0].setCallback(state, cb);
+				
+			myContent.setText(currFacingPoly);
+			polygons[currFacingPoly].startHintTimer();
+			
 		}
 		protected function collapsePolygons(state:uint=ANY, cb:Function=undefined):void
 		{
@@ -129,7 +133,7 @@
 			var polyIndex = index;
 			if (polyIndex >= polygons.length)
 				polyIndex %= polygons.length;
-			polygons[polyIndex].setText(text);
+			polygons[polyIndex].setText(text, myContent.mFolderName);
 		}
 		public function setHeader(text:String, index:uint):void
 		{
@@ -159,8 +163,9 @@
 		
 		public override function mouseUpHandler(event:Event):void 
 		{
-			if(getState()==EXTENDED && mouseRotMode)// (mouseRotMode)
+			if(getState()!=COLLAPSED && !ProgressTracker.NewContentIsRequested())
 			{
+//				trace("************EXTEND AGAIN!");
 				mouseRotMode = false;
 				extendPolygons();
 				myContent.setText(currFacingPoly);
@@ -186,7 +191,7 @@
 			ThreeDCanvas.setActiveCube(this);
 			// DOn't call javascript if this comes from there anyway
 			if(!scriptCall)
-				ThreeDApp.contentSelected(myContent.mTitle);
+				ThreeDApp.contentSelected(myContent.mFolderName, myContent.mContentUrl);
 			TitleFieldManager.fadeOutTitle(myTitleSprite);
 			if(getState()!=EXTENDED)
 				jump();
@@ -198,8 +203,10 @@
 			mouseIsOverMe = true;
 //			super.mouseOverHandler(event);
 
-			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this!=ThreeDCanvas.currActiveCube))
+			if (!isActive() || getState() != COLLAPSED || (ThreeDCanvas.currActiveCube != undefined && this != ThreeDCanvas.currActiveCube))
+			{
 				return;
+			}
 
 			ProgressTracker.setState(ProgressTracker.CONTENT_SELECT);
 
@@ -216,7 +223,7 @@
 			//var transVec = new ThreeDPoint(0,0,20).mul(invWVMatrix);
 			//this.myMatrixStack[1].translateByVec(transVec);
 			super.mouseOverHandler(event);
-
+			
 			ThreeDApp.SetMouseOverCube(myContent.mTitle);
 			ThreeDApp.keywords.Update(new Point(mouseX, mouseY), myContent.mKeywords);
 			
@@ -297,7 +304,6 @@
 				if (getState() == EXTENDED)
 				{
 					extendPolygons();
-					myContent.setText(currFacingPoly);
 				}
 				mouseIsOverMe = true;
 			}
@@ -422,6 +428,7 @@
 			}
 			else
 			{
+//				trace("collapse polys and collapse");
 				collapsePolygons(COLLAPSED, this.jump);
 			}
 		}
