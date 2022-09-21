@@ -4,7 +4,7 @@
   <output>
     <movie disabled="False" />
     <movie input="" />
-    <movie path="bin\3DEngine.swf" />
+    <movie path="..\3DEngine.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="1000" />

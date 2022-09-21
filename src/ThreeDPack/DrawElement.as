@@ -45,7 +45,8 @@ package ThreeDPack
 			this.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler, false, 2);
 			this.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler, false, 1);
 			this.addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler, false, 1);
-			this.addEventListener(MouseEvent.MOUSE_DOWN, mouseClickHandler, false, 0);
+			this.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler, false, 0);
+			this.addEventListener(MouseEvent.CLICK, mouseClickHandler, false, 0);
 			mouseIsDown = false;
 			moveDelta = new ThreeDPoint();
 			this.pendingMovements = new Array();
@@ -82,6 +83,12 @@ package ThreeDPack
 		public function mouseOutHandler(event:Event):void
 		{
 			//trace("mouse out");
+			/**/
+		}
+		
+		public function mouseDownHandler(event:Event):void
+		{
+			//trace("mouse down");
 			/**/
 		}
 

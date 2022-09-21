@@ -26,7 +26,7 @@
 		private var helpStrings:Array = ["start", "scope select", "scope selected", "content select", "content open"];
 		private var helpField:TextField;
 		private var stateFields:Array;
-		private var button:SimpleButton;
+		private var button:ArrowButton;
 		private var statePosition:Point = new Point(598, 84);
 		private var stateOffset:Number = 22.5;
 		private static var state:uint = CONTENT_SELECTED;
@@ -46,30 +46,24 @@
 			activeCircle.x = statePosition.x;
 			activeCircle.y = statePosition.y;
 			
-			stateFields = new Array(stateStrings.length);
-			var b:Sprite =  new Sprite();
-			b.graphics.beginFill(0xFFFFFF, 1);
-			b.graphics.drawCircle(
-				statePosition.x + 8,
-				statePosition.y + 8,
-				8);
-			b.graphics.endFill();
-			b.graphics.lineStyle(2, 0x666666, 1, false, "normal", "none");
-
-			b.graphics.moveTo(statePosition.x+2, statePosition.y + 8);
-			b.graphics.lineTo(statePosition.x+16, statePosition.y + 8);
-			b.graphics.moveTo(statePosition.x+8, statePosition.y + 2);
-			b.graphics.lineTo(statePosition.x+2, statePosition.y + 8);
-			b.graphics.lineTo(statePosition.x+8, statePosition.y + 14);
-			
-			button = new SimpleButton(b,b,b,b);
+			// back button and background circle
+			var arrowWidth = 12;
+			var circlePos:Point = new Point(
+				statePosition.x + arrowWidth - 8,
+				statePosition.y + arrowWidth - 4);
+			graphics.lineStyle(1, 0x666666, 1);
+			graphics.drawCircle(circlePos.x,circlePos.y,arrowWidth);
+		
+			button = new ArrowButton();
+			button.x = circlePos.x;
+			button.y = circlePos.y;
 			button.addEventListener(MouseEvent.MOUSE_DOWN, backButtonPressHandler);
 			button.alpha = 0;
 			addChild(button);
 
+			stateFields = new Array(stateStrings.length);
 			for (var fieldIndex:uint; fieldIndex < stateStrings.length;fieldIndex++ ) 
 			{
-				
 				stateFields[fieldIndex] = new TextField();
 				var field:TextField = stateFields[fieldIndex];
 				field.selectable = false;
@@ -84,7 +78,7 @@
 				field.height = 20;
 				field.rotation = 0.3;
 			}
-			helpField = new TextField();
+/*			helpField = new TextField();
 			helpField.selectable = false;
 			helpField.wordWrap = false;
 			helpField.multiline = false;
@@ -93,10 +87,8 @@
 			addChild(helpField);
 			helpField.x = stateOffset;
 			helpField.y = statePosition.y - 40;
-			//helpField.width = 0;
 			helpField.height = 40;
-			//helpField.rotation = 0.3;
-			
+*/			
 			newContentRequested = undefined;
 			scopeTypeToCarryOver = -1;
 		}
@@ -219,7 +211,7 @@
 			if (newState != state)
 			{
 				state = newState;
-				helpField.text = helpStrings[newState];
+//				helpField.text = helpStrings[newState];
 				activeCircle.x = statePosition.x + (stateOffset * (state+1));
 			}
 			var allFieldsCollapsed:Boolean = true;

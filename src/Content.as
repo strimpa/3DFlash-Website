@@ -78,12 +78,24 @@ package {
 			setText(mMyCube.getCurrFacingPoly());
 		}
 		
+		public function hasText(index:uint):Boolean
+		{
+			return mTexts[index]!=undefined;
+		}
+		
 		public function setText(index:uint):void
 		{
-			if(mTexts[index])
+			if(mTexts[index]!=undefined)
 				mMyCube.setText(mTexts[index], index);
 			if(mHeaders[index])
 				mMyCube.setHeader(mHeaders[index], index);
+				
+			var newControlFLags:uint = 0;
+			if (mTexts[index-1] != undefined)
+				newControlFLags |= ContentControls.CONTENTJUMP_LAST;
+			if (mTexts[index+1] != undefined)
+				newControlFLags |= ContentControls.CONTENTJUMP_NEXT;
+			ThreeDApp.contentControls.SetJumpFlags(newControlFLags);
 		}
 		
 	}

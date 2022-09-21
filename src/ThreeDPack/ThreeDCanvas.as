@@ -301,6 +301,8 @@
 		{
 			worldMatrix.rotate( 0,dragRot-=currRot,0 );
 			currRot /= 2;
+			if(rotFlag && currRot<0.2 && currRot>=-0.2)
+				dragRot += 0.4;
 			for(var objIndex:Number=0; objIndex<allObjects.length; objIndex++)
 			{
 				if(allObjects[objIndex].ignoreDraw())
@@ -349,7 +351,7 @@
 			drawList = new Array();
 			var objIndex:Number = 0;
 //			trace("isDirty():"+isDirty());
-			if(isDirty())
+			if (true)// isDirty())
 				for(; objIndex<allObjects.length; objIndex++)
 				{
 					if(allObjects[objIndex].ignoreDraw())

@@ -10,11 +10,12 @@ package
 		public static var textformatSmallBright:TextFormat;
 		public static var textformatMenuTitle:TextFormat;
 		public static var textformatCubeTitle:TextFormat;
-		public static var currentDevDomain:String = "http://www.gunnardroege.de/";//"http://localhost/website/";
-		public static var flashBinRoot:String = currentDevDomain + "3DEngine/bin/";
+//		public static var currentDevDomain:String = "http://localhost/website/";
+		public static var currentDevDomain:String = "http://www.gunnardroege.de/";
+		public static var flashBinRoot:String = currentDevDomain;// + "3DEngine/bin/";
 		public static var htmlRoot:String = currentDevDomain + "contentHtml/";
 		public static var contentExtensions:Array = [ "pdf", "zip", "xml" ];
-		public static var pictureExtensions:Array = [ "jpg", "png", "mov" ];
+		public static var pictureExtensions:Array = [ "jpg", "png", "mov", "gif"];
 		
 		public static var needsCubeRotHint = true;
 		
@@ -41,13 +42,13 @@ package
 			var edFont:Font = ContentManager.fonts[0];
 			textformatMenuTitle = new TextFormat();
 	        textformatMenuTitle.font = edFont.fontName;//"Edwardian Script ITC";//
-	        textformatMenuTitle.color = 0x888888;
+	        textformatMenuTitle.color = 0xBBBBBB;
 	        textformatMenuTitle.size = 60;
 	        textformatMenuTitle.underline = false;
 
 			textformatCubeTitle = new TextFormat();
 	        textformatCubeTitle.font = edFont.fontName;//"Edwardian Script ITC";//
-	        textformatCubeTitle.color = 0x888888;
+	        textformatCubeTitle.color = 0xEEEEEE;
 	        textformatCubeTitle.size = 40;
 	        textformatCubeTitle.underline = false;
 		}

@@ -29,7 +29,7 @@ package ThreeDPack
 
 		static var reset:Boolean = false;
 		
-		public function CurvedLineManager()
+		public function CurvedLineManager():void
 		{
 			allPointsCurvedOld = new Array();
 			curveObjects = new Array();
@@ -38,7 +38,7 @@ package ThreeDPack
 			colour = 0x3F3333;
 		}
 		
-		public static function doReset()
+		public static function doReset():void
 		{
 //			curveObjects[0].graphics.clear();
 			allPointsCurvedOld = new Array();

@@ -64,10 +64,10 @@ package
 				buttonSprite.graphics.drawCircle(0, 0, secondRadius);
 				buttonSprite.graphics.endFill();
 				buttonSprite.alpha = 0.1;
-				buttonSprite.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler,false, 1);
-				buttonSprite.addEventListener(MouseEvent.MOUSE_MOVE, mouseOverHandler,false, 1);
-				buttonSprite.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler, false, 0);
-				buttonSprite.addEventListener(MouseEvent.MOUSE_DOWN, mouseClickHandler, false, 2);
+				//buttonSprite.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler,false, 1);
+				//buttonSprite.addEventListener(MouseEvent.MOUSE_MOVE, mouseOverHandler,false, 1);
+				//buttonSprite.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler, false, 0);
+				//buttonSprite.addEventListener(MouseEvent.MOUSE_DOWN, mouseClickHandler, false, 2);
 				buttonSprite.name = "number:" + i;
 				buttons[i] = buttonSprite;
 				addChild(buttons[i]);

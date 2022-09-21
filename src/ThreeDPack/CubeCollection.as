@@ -14,6 +14,7 @@ package ThreeDPack
 		static const back:uint=1<<4;
 		static var mCubes:Array;
 		static var mContents:Array;
+		private var mCreationNum:uint; 
 		var pos:ThreeDPoint;
 
 		public function CubeCollection(position:ThreeDPoint) 
@@ -27,18 +28,20 @@ package ThreeDPack
 			var gap = 2;
 			mCubes = new Array(rowCount * rowCount);
 			mContents = new Array(rowCount * rowCount);
-			var creationIndex = 0;
+			mCreationNum = 0;
 			for(var row=0;row<rowCount;row++)
 				for(var col=0;col<rowCount;col++)
 				{
 					var position:ThreeDPoint = new ThreeDPoint(-totalWidth*0.5 + size*row * 1.3, -totalWidth*0.5 + size*col * 1.3, 0);
 					//var box = 
-					var newContent = ContentManager.getContent(creationIndex);
+					var newContent = ContentManager.getContent(mCreationNum);
+					if (null == newContent)
+						break;
 					mContents.push(newContent);
-					mCubes[creationIndex] = new Cube(size, position, creationIndex, newContent);
-					mCubes[creationIndex].name = "higherBox_"+creationIndex;
-					ThreeDCanvas.appendToObjects(mCubes[creationIndex]);
-					creationIndex++;
+					mCubes[mCreationNum] = new Cube(size, position, mCreationNum, newContent);
+					mCubes[mCreationNum].name = "higherBox_"+mCreationNum;
+					ThreeDCanvas.appendToObjects(mCubes[mCreationNum]);
+					mCreationNum++;
 				}
 		}
 		
@@ -60,6 +63,8 @@ package ThreeDPack
 		{
 			for each(var aCube:Cube in mCubes)
 			{
+				if (null == aCube)
+					break;
 				if(aCube.getContent().mCategory == keyword)
 					aCube.setActive(act);
 				else
@@ -70,6 +75,8 @@ package ThreeDPack
 		{
 			for each(var aCube:Cube in mCubes)
 			{
+				if (null == aCube)
+					break;
 				if (aCube.getContent().mKeywords.indexOf(keyword) != -1)
 					aCube.setActive(act);
 				else
@@ -80,6 +87,8 @@ package ThreeDPack
 		{
 			for (var cubeIndex=0; cubeIndex < mCubes.length; cubeIndex++ )
 			{
+				if (null == mCubes[cubeIndex])
+					break;
 				if (cubeIndex == index || index==-1)
 					mCubes[cubeIndex].setActive(act);
 				else

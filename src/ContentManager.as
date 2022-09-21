@@ -34,7 +34,7 @@ package
 			LoadObject("baloo.swf", swf, undefined, ThreeDApp.addToBackground);
 			LoadObject("content.xml", xml, contentXML, ThreeDApp.InitCanvas);
 			LoadObject("sphere.obj", sceneData, undefined, ThreeDPack.Obj2As.onData);
-			LoadObject("../../contentHtml/contentStyle_as.css", css, undefined, Content.contentStyleLoaded);
+			LoadObject(globals.htmlRoot+"contentStyle_as.css", css, undefined, Content.contentStyleLoaded);
 			LoadObject("barock.swf", swf, undefined, Content.contentBGLoaded);
 			LoadObject("exit.swf", swf, undefined, ThreeDCanvas.exitSpriteLoaded);
 			LoadObject("RotHint.swf", swf, undefined, ThreeDPack.Polygon.SetRotHintSprite);
@@ -118,6 +118,8 @@ package
 		public static function getContent(number:Number):Content
 		{
 			var content:Content = new Content();
+			if (number >= contentXML.content.length())
+				return null;
 			var xmlitem:XML = contentXML.content[number];
 			content.mTitle = xmlitem.title;
 			content.mCategory = xmlitem.category;

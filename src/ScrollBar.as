@@ -4,9 +4,15 @@ package
 	import flash.events.Event;
 	import flash.text.TextField;
 	import flash.events.MouseEvent;
+	import ThreeDPack.Cube;
 
 	public class ScrollBar extends Sprite
 	{
+		const maxLength:uint = 525;
+		const lengthStep:uint = 105;
+		const targetY:uint = 132;
+		const startY:uint = targetY + (maxLength / 2);
+		const moveStep:uint = lengthStep / 2;
 		var broadth:int = 20;
 		var length:Number = 0;
 		var x_offset:int = 5;
@@ -16,11 +22,6 @@ package
 		var handleHeight:Number = broadth - 4;
 		var handleY:Number = 0;
 		var mouseDownY:Number = 0;
-		const maxLength:uint = 525;
-		const lengthStep:uint = 105;
-		const targetY:uint = 132;
-		const startY:uint = targetY + (maxLength / 2);
-		const moveStep:uint = lengthStep/2;
 		
 		public function BindTextfield(targetField:TextField):void
 		{
@@ -50,7 +51,8 @@ package
 		
 		public function textFieldScrollHandler(event:Event):void
 		{
-			handleY = (maxLength-handleHeight) * (targetField.scrollV/targetField.maxScrollV);
+			if(undefined!=targetField)
+				handleY = (maxLength-handleHeight) * (targetField.scrollV/targetField.maxScrollV);
 		}
 		public function handleDownHandler(event:MouseEvent):void
 		{
@@ -82,8 +84,8 @@ package
 		{
 			graphics.clear();
 			
-			if (numChildren > 0)
-				removeChildAt(0);
+			for (var childIndex = 0; childIndex < numChildren; childIndex++ )
+				removeChildAt(childIndex);
 			
 			handle = new Sprite();
 			handle.graphics.lineStyle(1, 0x3D3F3D, 1);

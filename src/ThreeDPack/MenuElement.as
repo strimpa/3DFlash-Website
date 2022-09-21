@@ -72,7 +72,7 @@ package ThreeDPack
 		}
 		public override function mouseOutHandler(event:Event):void
 		{
-//			trace("mouse out "+category);
+			trace("mouse out "+category);
 			mouseIsOverMe = false;
 			if (ProgressTracker.scopeType == ProgressTracker.KEYWORD_SCOPE || getState()!=COLLAPSED || !isActive())
 				return;
@@ -82,7 +82,8 @@ package ThreeDPack
 		}
 		public override function OnCollapsed():void
 		{
-			if(ProgressTracker.getState()<ProgressTracker.SCOPE_SELECTED)
+			//trace("ProgressTracker.getState():"+ProgressTracker.getState());
+			//if(ProgressTracker.getState()<ProgressTracker.SCOPE_SELECTED)
 				ProgressTracker.resetContent();
 			super.OnCollapsed();
 		}

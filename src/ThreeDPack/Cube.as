@@ -27,6 +27,8 @@
 		private var currCubeRot:Number = 0;
 		private var mouseRotMode:Boolean = false;
 		private var lastDragPos:Point;
+		private var autoTargetRot:Number = NaN;
+		private var rotationCallBack:Function = undefined; 
 		
 		private var currFacingPoly:uint;
 		
@@ -104,18 +106,17 @@
 			return myContent;
 		}
 		
-		protected function extendPolygons(state:uint=ANY, cb:Function=undefined):void
+		public function extendPolygons(state:uint=ANY, cb:Function=undefined):void
 		{
 			for each(var poly:Polygon in polygons)
 				poly.extend();
 			if(cb!=undefined)
 				polygons[0].setCallback(state, cb);
 				
+			evaluatefacingFace();
 			myContent.setText(currFacingPoly);
-			polygons[currFacingPoly].startHintTimer();
-			
 		}
-		protected function collapsePolygons(state:uint=ANY, cb:Function=undefined):void
+		public function collapsePolygons(state:uint=ANY, cb:Function=undefined):void
 		{
 			for each(var poly:Polygon in polygons)
 				poly.collapse();
@@ -130,10 +131,10 @@
 
 		public function setText(text:String, index:uint):void
 		{
-			var polyIndex = index;
-			if (polyIndex >= polygons.length)
-				polyIndex %= polygons.length;
-			polygons[polyIndex].setText(text, myContent.mFolderName);
+			//var polyIndex = index;
+			//if (polyIndex >= polygons.length)
+				//polyIndex %= polygons.length;
+			polygons[index].setText(text, myContent.mFolderName);
 		}
 		public function setHeader(text:String, index:uint):void
 		{
@@ -153,8 +154,10 @@
 			mouseRotMode = true;
 		}
 		
-		public override function mouseClickHandler(event:Event):void
+		public override function mouseDownHandler(event:Event):void
 		{
+			if (!isNaN(autoTargetRot) || ProgressTracker.getState()<ProgressTracker.SCOPE_SELECTED)
+				return;
 			if (getState() == EXTENDED)
 			{
 				collapsePolygons(COLLAPSED, startRotationMode);
@@ -163,7 +166,9 @@
 		
 		public override function mouseUpHandler(event:Event):void 
 		{
-			if(getState()!=COLLAPSED && !ProgressTracker.NewContentIsRequested())
+			if (!isNaN(autoTargetRot) || ProgressTracker.getState()<ProgressTracker.SCOPE_SELECTED)
+				return;
+			if(myContent.hasText(currFacingPoly) && !ProgressTracker.NewContentIsRequested() && getState()==EXTENDED)	
 			{
 //				trace("************EXTEND AGAIN!");
 				mouseRotMode = false;
@@ -171,7 +176,8 @@
 				myContent.setText(currFacingPoly);
 			}
 
-			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this!=ThreeDCanvas.currActiveCube))
+			trace("my current state: "+getState());
+			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this==ThreeDCanvas.currActiveCube))
 				return;
 
 			SelectAndExtend();
@@ -200,6 +206,8 @@
 		
 		public override function mouseOverHandler(event:Event):void
 		{
+			if (!isNaN(autoTargetRot) || ProgressTracker.getState()<ProgressTracker.SCOPE_SELECTED)
+				return;
 			mouseIsOverMe = true;
 //			super.mouseOverHandler(event);
 
@@ -231,6 +239,8 @@
 		
 		public override function mouseMoveHandler(event:Event):void
 		{
+			if (!isNaN(autoTargetRot) || ProgressTracker.getState()<ProgressTracker.SCOPE_SELECTED)
+				return;
 			mouseIsOverMe = true;
 			if (mouseRotMode)
 			{
@@ -253,6 +263,8 @@
 		
 		public override function mouseOutHandler(event:Event):void
 		{
+			if (!isNaN(autoTargetRot))
+				return;
 			if(!isActive() || getState()!=COLLAPSED || (ThreeDCanvas.currActiveCube!=undefined && this!=ThreeDCanvas.currActiveCube))
 				return;
 			if (getState() == COLLAPSED)
@@ -277,15 +289,50 @@
 			var dist:ThreeDPoint = cameraFocusPoint.minus(mPos);
 			dist.scale(movePerc);
 			currMovePos = mPos.plus(dist);
-			if (this.movementIndex > 0)
+			if (this.movementIndex >= 0)
 			{
-				var targetRot:Number = ThreeDCanvas.dragRot - (ThreeDCanvas.dragRot % 90);
+				var targetRot:Number = 0;// ThreeDCanvas.dragRot - (ThreeDCanvas.dragRot % 90);
 				currCubeRot = (targetRot - ThreeDCanvas.dragRot) * movePerc;
-
-				evaluatefacingFace();
+				//evaluatefacingFace();
 			}
 			else
 				myMatrixStack[2].Identity();
+		}
+		
+		public function AutoRotateRight()
+		{
+			autoTargetRot = currCubeRot + 90;
+			rotationCallBack = extendPolygons;
+		}
+		public function AutoRotateLeft()
+		{
+			autoTargetRot = currCubeRot - 90;
+			rotationCallBack = extendPolygons;
+		}
+		
+		private function ProcessRotations()
+		{
+			if (!isNaN(autoTargetRot) && autoTargetRot != currCubeRot)
+			{
+				currCubeRot += (autoTargetRot - currCubeRot)/2;
+				if (Math.abs(currCubeRot - autoTargetRot) < 2)
+					currCubeRot = autoTargetRot;
+				if (currCubeRot == autoTargetRot)
+				{
+					if(undefined!=rotationCallBack)
+						rotationCallBack();
+					rotationCallBack = undefined;
+					autoTargetRot = undefined;
+				}
+				evaluatefacingFace();
+			}
+			else if (getState()==EXTENDED && !mouseRotMode)
+			{
+				var globalRot:Number = currCubeRot + ThreeDCanvas.dragRot;
+				var diff:Number = Math.abs(globalRot % 90)<45 ? -(globalRot%90) : (globalRot%90);
+				var targetRot:Number = (globalRot + diff) - ThreeDCanvas.dragRot;
+				currCubeRot = currCubeRot + (targetRot - currCubeRot)/2;
+			}
 		}
 		
 		public override function Process(parent:ThreeDObject=undefined):void
@@ -315,14 +362,8 @@
 				//this.myMatrixStack[1].traceMe();
 				ThreeDCanvas.setDirty();
 			}
+			ProcessRotations();
 			
-			if (getState()==EXTENDED && !mouseRotMode)
-			{
-				var globalRot:Number = currCubeRot + ThreeDCanvas.dragRot;
-				var diff:Number = Math.abs(globalRot % 90)<45 ? -(globalRot%90) : (globalRot%90);
-				var targetRot:Number = (globalRot + diff) - ThreeDCanvas.dragRot;
-				currCubeRot = currCubeRot + (targetRot - currCubeRot)/2;
-			}
 			myMatrixStack[2] = new ThreeDMatrix();
 			myMatrixStack[2].rotate(180, currCubeRot, 0);	
 			myMatrixStack[2].translateByVec(currMovePos);
@@ -354,6 +395,7 @@
 				if (normal.z < lastZ)
 				{
 					currFacingPoly = polyIndex;
+					
 					lastZ = normal.z;
 				}
 				polygons[polyIndex].colour = currColour;
@@ -424,11 +466,12 @@
 		{
 			if (polygons[0].getState() == COLLAPSED)
 			{
+				trace("super.jump()");
 				super.jump();
 			}
 			else
 			{
-//				trace("collapse polys and collapse");
+				trace("collapse polys and collapse");
 				collapsePolygons(COLLAPSED, this.jump);
 			}
 		}

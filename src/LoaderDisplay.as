@@ -81,7 +81,7 @@
 		public function Process():void
 		{
 			if (loadingItems.length > 0)
-				alpha += 0.5;
+				alpha += 0.2;
 			else
 				alpha -= 0.1;
 			alpha = alpha<0?0:(alpha>1?1:alpha);

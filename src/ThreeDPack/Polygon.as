@@ -180,10 +180,20 @@
 		public override function mouseClickHandler(event:Event):void
 		{
 			trace("mouseClickHandler:"+notMoveable() +", "+ bubbleClickEvent);
-			if(notMoveable())
+			if(notMoveable() && ThreeDCanvas.rotFlag)
 				return;
 			if(parentObj && bubbleClickEvent)
 				parentObj.mouseClickHandler(event);
+				
+			bubbleClickEvent = true;
+		}
+		public override function mouseDownHandler(event:Event):void
+		{
+			trace("mouseDownHandler:"+notMoveable() +", "+ bubbleClickEvent);
+			if(notMoveable() && ThreeDCanvas.rotFlag)
+				return;
+			if(parentObj && bubbleClickEvent)
+				parentObj.mouseDownHandler(event);
 				
 			bubbleClickEvent = true;
 		}
@@ -255,7 +265,6 @@
 			{
 				if (rotHintState != DrawElement.COLLAPSED)
 				{
-					trace("rotHintPos:"+rotHintPos);
 					if (rotHintState == DrawElement.EXTENDING)
 					{
 						if(rotHintPos > 0)
@@ -308,7 +317,8 @@
 			{
 				textSprite.removeChild(textField);
 			}
-			removeChild(textSprite);
+			if(contains(textSprite))
+				removeChild(textSprite);
 			textField = undefined;
 			textSprite.graphics.clear();
 //			trace("poly " + unsortedIndex + " collapsed");
@@ -428,11 +438,12 @@
 					textField.blendMode = BlendMode.LAYER;
 					textSprite.addChild(textField);
 					textField.styleSheet = Content.getStyle();
+					ThreeDApp.BindScrollbar(textField);
+
 					var eventRootString = globals.htmlRoot + folderName
 					var picEventRootString = "href=\"event:pic:" + globals.htmlRoot + folderName
 					
 					// Inserting remote image path and lightbox rel tag
-					trace(text);
 					var myPattern:RegExp = /src=\"/g;
 					text = text.replace(myPattern, "src=\"" + eventRootString + "/");
 					// Get all links
@@ -450,12 +461,11 @@
 						myPattern = new RegExp("href=\"(.*)\."+ext.toUpperCase(), "g");
 						text = text.replace(myPattern, picEventRootString + "/$1."+ext);
 					}
-					trace(text);
 					
 					textField.htmlText = text;
 					var picLoader:TargetLoad = ContentManager.getLoader();
 					var picsFound:Boolean = false;
-					var pictureIds:Array = ["pic1", "pic2", "pic3", "pic4", "pic5", "pic6", "pic7", "pic8", "pic9"];
+					var pictureIds:Array = ["pic0", "pic1", "pic2", "pic3", "pic4", "pic5", "pic6", "pic7", "pic8", "pic9"];
 					myCurrentLoaders = new Array();
 					for each(var picId in pictureIds)
 					{
@@ -487,6 +497,8 @@
 					textSprite);
 				CurvedLineManager.setFilling(true);
 				CurvedLineManager.setRadius(50);
+				
+				startHintTimer();
 			}
 		}
 		

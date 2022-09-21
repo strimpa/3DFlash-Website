@@ -44,6 +44,7 @@ package
 		public static var loader:LoaderDisplay;
 		public static var progress:ProgressTracker;
 		public static var scrollbar:ScrollBar;
+		public static var contentControls:ContentControls;
 		public static var scrollbarFeeler:Sprite;
 
 		// controls
@@ -107,6 +108,8 @@ package
 			elements.addChild(progress);
 			scrollbar = new ScrollBar();
 			elements.addChild(scrollbar);
+			contentControls = new ContentControls();
+			elements.addChild(contentControls);
 			output("create bezier overlay");
 			CreateBezierOverlay();
 //			output("create debug elements");
@@ -142,7 +145,7 @@ package
 
 		public static function picClicked(picUrl, title, doc):void
 		{
-			jscriptMgr.call("showImage", title, picUrl, globals.htmlRoot + "/" + doc);
+			jscriptMgr.call("showImage", title, picUrl, globals.htmlRoot + doc);
 		}
 
 		public static function InitCanvas(data:Object):void
@@ -365,15 +368,16 @@ package
 		
 		public function CreateDebugElements():void
 		{
-			slider =new MySlider(new Point(10, height+20),500,0,0.1,0.0122);
+//			slider =new MySlider(new Point(10, height+20),500,0,0.1,0.0122);
 //			addChild(slider);
-			slider.setCallback(matrixCallback);
+//			slider.setCallback(matrixCallback);
 			debugText = new TextField();
+			debugText.defaultTextFormat = globals.textformatSmallBright;
 			addChild(debugText);
 			debugText.x = 100;
-			debugText.y = 15;
+			debugText.y = 150;
 		
-			var buttonShape:Sprite = new Sprite();
+/*			var buttonShape:Sprite = new Sprite();
 			buttonShape.graphics.beginFill(0x888888);
 			buttonShape.graphics.drawRect(0,0,50,20);
 			buttonShape.graphics.endFill();
@@ -382,7 +386,7 @@ package
 			addChild(rotButton);
 			rotButton.x = 10;
 			rotButton.y = 20;
-
+*/
 //			var loadButtonShape:Sprite = new Sprite();
 //			loadButtonShape.graphics.beginFill(0x888888);
 //			loadButtonShape.graphics.drawRect(0,0,50,20);
@@ -433,10 +437,12 @@ package
 		public static function BindScrollbar(field:TextField)
 		{
 			scrollbar.BindTextfield(field);
+			contentControls.Show();
 		}
 		public static function UnbindScrollbar()
 		{
 			scrollbar.UnbindTextfield();
+			contentControls.Hide();
 		}
 		public static function addFeeler():Sprite
 		{
@@ -451,8 +457,10 @@ package
 		
 		private function draw(event:Event):void
 		{
-			if(debugText)
-				debugText.text = "fps:"+lastFrameCount;//slider.getValue();
+			if (debugText)
+			{
+				debugText.text = "fps:" + lastFrameCount;//slider.getValue();
+			}
 			
 			var currSecondVal:Number = new Date().getSeconds();
 			if(currSecondVal!=lastSecondVal)
@@ -483,6 +491,8 @@ package
 			progress.Process();
 			
 			scrollbar.Process();
+			ArrowButton.Process();
+			contentControls.Process();
 		} 
 	}
 }
